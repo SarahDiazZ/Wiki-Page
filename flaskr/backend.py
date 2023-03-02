@@ -52,7 +52,7 @@ class Backend:
                     return True
                 return False
 
-    def get_image(self):
+    def get_image(self, name):
         bucket = self.storage_client.bucket(self.content_bucket)
         blob = bucket.get_blob(name)
         return blob.download_to_file()
