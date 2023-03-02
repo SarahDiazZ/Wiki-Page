@@ -23,8 +23,6 @@ def make_endpoints(app):
         user = User(user_id)
         return user
 
-    # Flask uses the "app.route" decorator to call methods when users
-    # go to a specific route on the project's website.
     @app.route("/")
     def home():
         if current_user.is_authenticated:
@@ -32,8 +30,6 @@ def make_endpoints(app):
             return render_template("main.html", user_name=username)
         else:
             return render_template("main.html")
-
-    # TODO(Project 1): Implement additional routes according to the project requirements.
 
     @app.route("/signup", methods = ['GET', 'POST'])
     def signup():
@@ -51,7 +47,6 @@ def make_endpoints(app):
                 flash("Username already exists. Please login or choose a different username.", category="error")
         return render_template('signup.html')
 
-
     @app.route("/login", methods = ['GET', 'POST'])
     def login():
         if request.method == 'POST':
@@ -65,7 +60,7 @@ def make_endpoints(app):
             if be.sign_in(username, password):
                 user = User(username)
                 login_user(user)
-                flash("You have been logged in.", category="success")
+                return redirect('/')
             else:
                 flash("Invalid username or password. Please try again.", category="error")
         return render_template('login.html')
@@ -76,6 +71,26 @@ def make_endpoints(app):
         return render_template('logout.html')
 
     @login_required
-    @app.route("/upload")
+    @app.route("/upload", methods = ['GET', 'POST'])
     def upload():
+        if request.method == 'POST':
+            file = request.files.get("File")
+            if file:
+                be.upload(current_user.username, file)
+                flash("File uploaded successfully.", category="success")
+            else:
+                flash("No file selected.", category="error")
+        return render_template('upload.html')
+
+    @app.route("/pages")
+    def pages():
+        return "This is the pages page"
+        
+    @app.route("/pages/<page_title>")
+    def page_uploads(page_title):
         pass
+
+    @app.route("/about")
+    def about():
+        return "About this Wiki"
+        

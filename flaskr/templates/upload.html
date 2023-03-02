@@ -1,17 +1,14 @@
 {% extends "main.html" %}
 
 {% block content %}
-    <br><font size= 4><b>Sign Up</b></font>
+    <br><font size= 4><b>Upload</b></font>
 
-    <form method="POST" action="/signup">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="Username">
-    
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="Password">
-    
-        <input type="submit" value="Sign up">
-    </form>
+    <p>
+        <form method="POST" action="/upload" enctype="multipart/form-data">
+            <input type="file" name="File">
+            <button type="submit">Upload</button>
+        </form>
+    </p>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -28,5 +25,5 @@
             </ul>
         {% endif %}
     {% endwith %}
-
+    
 {% endblock %}

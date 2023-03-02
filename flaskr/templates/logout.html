@@ -1,45 +1,7 @@
-{% if not current_user.is_authenticated %}
-<div>
-    <a href="/">
-        <button>Home</button>
-      </a>
-      <a href="/about">
-        <button>About</button>
-      </a>
-      <a href="/pages">
-        <button>Pages</button>
-      </a>
-      <span>   |   </span>
-      <a href="/login">
-        <button>Log In</button>
-      </a>
-      <a href="/signup">
-        <button>Sign Up</button>
-      </a>
-</div>
-{% else %}
-<div>
-      <a href="/">
-        <button>Home</button>
-      </a>
-      <a href="/pages">
-        <button>Pages</button>
-      </a>
-      <a href="/about">
-        <button>About</button>
-      </a>
-      <span>|   {{ current_user.username }}   |</span>
-      <a href="/upload">
-        <button>Upload</button>
-      </a>
-      <a href="/logout">
-        <button>Logout</button>
-      </a>
-      <div>
-        <span>Welcome, {{ current_user.username }}!</span>
-      </div>
-</div>
-{% endif %}
-<div>       
-    You have been successfully logged out.
-</div>
+{% extends "main.html" %}
+
+{% block content %}
+    <div>       
+        <br>You have been successfully logged out.
+    </div>
+{% endblock %}

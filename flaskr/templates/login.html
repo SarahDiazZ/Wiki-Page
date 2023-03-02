@@ -1,68 +1,32 @@
-{% if not current_user.is_authenticated %}
-<div>
-    <a href="/">
-        <button>Home</button>
-      </a>
-      <a href="/about">
-        <button>About</button>
-      </a>
-      <a href="/pages">
-        <button>Pages</button>
-      </a>
-      <span>   |   </span>
-      <a href="/login">
-        <button>Log In</button>
-      </a>
-      <a href="/signup">
-        <button>Sign Up</button>
-      </a>
-</div>
-{% else %}
-<div>
-      <a href="/">
-        <button>Home</button>
-      </a>
-      <a href="/pages">
-        <button>Pages</button>
-      </a>
-      <a href="/about">
-        <button>About</button>
-      </a>
-      <span>|   {{ current_user.username }}   |</span>
-      <a href="/upload">
-        <button>Upload</button>
-      </a>
-      <a href="/logout">
-        <button>Logout</button>
-      </a>
-      <div>
-        <span>Welcome, {{ current_user.username }}!</span>
-      </div>
-</div>
-{% endif %}
+{% extends "main.html" %}
 
-<form method="POST" action="/login">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="Username">
-  
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="Password">
-  
-    <input type="submit" value="Log in">
-  </form>
+{% block content %}
+    <br><font size= 4><b>Log In</b></font>
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-      <ul>
-          {% for message in messages %}
-              {% if message.category == 'error' %}
-                  <li style="color: red">{{ message }}</li>
-              {% elif message.category == 'success' %}
-                  <li style="color: green">{{ message }}</li>
-              {% else %}
-                  <li>{{ message }}</li>
-              {% endif %}
-          {% endfor %}
-      </ul>
-  {% endif %}
-{% endwith %}
+    <form method="POST" action="/login">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="Username">
+    
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="Password">
+    
+        <input type="submit" value="Log in">
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    {% if message.category == 'error' %}
+                        <li style="color: red">{{ message }}</li>
+                    {% elif message.category == 'success' %}
+                        <li style="color: green">{{ message }}</li>
+                    {% else %}
+                        <li>{{ message }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+{% endblock %}
