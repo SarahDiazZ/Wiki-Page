@@ -91,7 +91,7 @@ def make_endpoints(app):
     @app.route("/pages/<page_title>")
     def page_uploads(page_title):
         content = be.get_wiki_page(page_title)
-        return content
+        return render_template("pages.html", page_content=content)
 
     @app.route("/about")
     def about():
