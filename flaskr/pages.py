@@ -75,8 +75,9 @@ def make_endpoints(app):
     def upload():
         if request.method == 'POST':
             file = request.files.get("File")
+            file_name = request.form['File name']
             if file:
-                be.upload(current_user.username, file)
+                be.upload(file_name, file)
                 flash("File uploaded successfully.", category="success")
             else:
                 flash("No file selected.", category="error")

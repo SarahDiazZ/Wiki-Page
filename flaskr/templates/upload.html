@@ -5,7 +5,10 @@
 
     <p>
         <form method="POST" action="/upload" enctype="multipart/form-data">
-            <input type="file" name="File">
+            <label for="File name">Name your file:</label>
+            <input type="text" name="File name">
+            <br>
+            <br><input type="file" name="File">
             <button type="submit">Upload</button>
         </form>
     </p>
