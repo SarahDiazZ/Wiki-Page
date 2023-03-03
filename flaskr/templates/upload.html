@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+
+{% block content %}
+    <br><font size= 4><b>Upload</b></font>
+
+    <p>
+        <form method="POST" action="/upload" enctype="multipart/form-data">
+            <label for="File name">Name your file:</label>
+            <input type="text" name="File name">
+            <br>
+            <br><input type="file" name="File">
+            <button type="submit">Upload</button>
+        </form>
+    </p>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    {% if message.category == 'error' %}
+                        <li style="color: red">{{ message }}</li>
+                    {% elif message.category == 'success' %}
+                        <li style="color: green">{{ message }}</li>
+                    {% else %}
+                        <li>{{ message }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    
+{% endblock %}

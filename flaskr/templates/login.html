@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+
+{% block content %}
+    <br><font size= 4><b>Log In</b></font>
+
+    <form method="POST" action="/login">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="Username">
+    
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="Password">
+    
+        <input type="submit" value="Log in">
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    {% if message.category == 'error' %}
+                        <li style="color: red">{{ message }}</li>
+                    {% elif message.category == 'success' %}
+                        <li style="color: green">{{ message }}</li>
+                    {% else %}
+                        <li>{{ message }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+{% endblock %}

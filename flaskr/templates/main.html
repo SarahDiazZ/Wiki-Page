@@ -3,11 +3,10 @@
 
 <head>
     <head>
-        <!-- TODO(Checkpoint Requirement 3): Change the title and content of your wiki.-->
         <title>Wiki Server</title>
     </head>
 </head>
-{% if not user_is_logged_in %}
+{% if not current_user.is_authenticated %}
 <div>
     <a href="/">
         <button>Home</button>
@@ -18,6 +17,7 @@
       <a href="/pages">
         <button>Pages</button>
       </a>
+      <span>   |   </span>
       <a href="/login">
         <button>Log In</button>
       </a>
@@ -25,9 +25,9 @@
         <button>Sign Up</button>
       </a>
 </div>
+
 {% else %}
 <div>
-      <span>Welcome, {{ user_name }}!</span>
       <a href="/">
         <button>Home</button>
       </a>
@@ -37,6 +37,7 @@
       <a href="/about">
         <button>About</button>
       </a>
+      <span>|  {{ current_user.username }}   |</span>
       <a href="/upload">
         <button>Upload</button>
       </a>
@@ -45,12 +46,23 @@
       </a>
 </div>
 {% endif %}
-<body>
-    <!-- TODO(Project 1): Implement routes. -->
-    <div>       
-        <!-- TODO(Checkpoint Requirement 3): Change the title and content of your wiki.-->
-        Welcome to our awesome Wiki Server, we're glad to have you here!
-    </div>
-</body>
+
+{% block content %}
+    <body>
+        {% if not current_user.is_authenticated %}
+            <p>
+                <span>Welcome to our awesome Wiki Server, we're glad to have you here!</span>
+            </p>
+        {% else %}
+            <p>
+                Welcome, <span style = "color:fuchsia"><b>{{ current_user.username }}</b></span>!
+            </p>
+        {% endif %}
+
+        <div>       
+            <br><font size= 5><b>The Ultimate Guide to Building a PC</b></font>
+        </div>
+    </body>
+{% endblock %}
 
 </html>
