@@ -3,5 +3,13 @@
 {% block content %}
 <br><font size= 4><b>Pages</b></font>
 
+<body>
+    <h1> Wiki Pages </h1>
+    <ul>
+        {% for page in pages %}
+        <li><a href="/pages/{{ page }}">{{ page }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
 
 {% endblock %}

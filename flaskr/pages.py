@@ -86,11 +86,12 @@ def make_endpoints(app):
 
     @app.route("/pages")
     def pages():
-        return "This is the pages page"
+        return render_template("pages.html", pages=be.get_all_page_names())
         
     @app.route("/pages/<page_title>")
     def page_uploads(page_title):
-        pass
+        content = be.get_wiki_page(page_title)
+        return content
 
     @app.route("/about")
     def about():

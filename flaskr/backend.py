@@ -13,18 +13,20 @@ class Backend:
     def get_wiki_page(self, name):
         bucket = self.storage_client.bucket(self.content_bucket)
         blob = bucket.get_blob(name)
-        return blob.download_to_file()
+        return blob.download_as_string().decode("utf-8")
 
     def get_all_page_names(self):
         page_names = []
         blobs = self.storage_client.list_blobs(self.content_bucket)
         for blob in blobs:
-            page_names.append(blob.name)
+            if blob.name.endswith(".html"):
+                page_names.append(blob.name)
         return page_names
 
     def upload(self, name, file):
         bucket = self.storage_client.bucket(self.content_bucket)
-        blob = bucket.blob(name)
+        file_type = file.filename.split(".")[-1]
+        blob = bucket.blob(f"{name}.{file_type}")
         if blob.exists():
             return False
         else:
