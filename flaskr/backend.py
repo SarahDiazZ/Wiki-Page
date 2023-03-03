@@ -52,7 +52,16 @@ class Backend:
                     return True
                 return False
 
-    def get_image(self, name):
+    # def get_image(self, name):
+    #     bucket = self.storage_client.bucket(self.content_bucket)
+    #     blob = bucket.get_blob(name)
+    #     return blob.download_to_filename(f'{name}.png')
+
+    def get_image(self, names):
         bucket = self.storage_client.bucket(self.content_bucket)
-        blob = bucket.get_blob(name)
-        return blob.download_to_file()
+        images = []
+        for name in names:
+            blob = bucket.get_blob(name)
+            image_data = blob.download_as_bytes()
+            images.append(image_data)
+        return images

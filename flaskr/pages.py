@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, flash
 from flaskr import backend
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 import hashlib
+import base64
 
 
 def make_endpoints(app):
@@ -93,5 +94,9 @@ def make_endpoints(app):
 
     @app.route("/about")
     def about():
-        return "About this Wiki"
+        image_names = ["camila", "sarah", "ricardo"]
+        image_datas = be.get_image(image_names)
+        image_data = [base64.b64encode(image).decode('utf-8') for image in image_datas]
+        return render_template('about.html', image_datas=image_data)
+
         
