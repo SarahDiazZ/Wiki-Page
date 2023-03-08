@@ -37,5 +37,6 @@ def test_home_page(client):
 def test_pages(client):
     resp = client.get("/pages")
     assert resp.status_code == 200
+
     
 

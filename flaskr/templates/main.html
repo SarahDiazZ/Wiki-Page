@@ -7,7 +7,7 @@
     </head>
 </head>
 {% if not current_user.is_authenticated %}
-<div>
+<div id="not-loggedin-buttons">
     <a href="/">
         <button>Home</button>
       </a>
@@ -27,7 +27,7 @@
 </div>
 
 {% else %}
-<div>
+<div id="loggedin-buttons">
       <a href="/">
         <button>Home</button>
       </a>
@@ -59,7 +59,7 @@
             </p>
         {% endif %}
 
-        <div>       
+        <div id="your_id">       
             <br><font size= 5><b>The Ultimate Guide to Building a PC</b></font>
         </div>
     </body>
