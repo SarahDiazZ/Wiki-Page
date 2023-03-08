@@ -1,14 +1,14 @@
 {% extends "main.html" %}
 
 {% block content %}
-<div id="display-pages">
+<div id='display-pages'>
     <body>
         <!-- 
             The if statement checks if the 'pages' variable is defined and not empty. 
             If it is, a header is displayed, and a bulleted list of links to each page is displayed using a 'for' loop that iterates over the 'pages' variable. 
         -->
         {% if pages %}
-        <h1 id="wiki-pages"> Wiki Pages </h1>
+        <h1> Wiki Pages </h1>
             <ul>
                 {% for page in pages %}
                 <li><a href="/pages/{{ page }}">{{ page }}</a></li>
