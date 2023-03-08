@@ -1,27 +1,28 @@
 {% extends "main.html" %}
 
 {% block content %}
-
-<body>
-    <!-- 
-        The if statement checks if the 'pages' variable is defined and not empty. 
-        If it is, a header is displayed, and a bulleted list of links to each page is displayed using a 'for' loop that iterates over the 'pages' variable. 
-    -->
-    {% if pages %}
-    <h1 id="wiki-pages"> Wiki Pages </h1>
-        <ul>
-            {% for page in pages %}
-            <li><a href="/pages/{{ page }}">{{ page }}</a></li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    <!-- 
-         This if statement checks if the 'page_content' variable is defined and not empty. 
-         If it is, the content of the specific page is displayed using the 'safe' fileter to avoid HTML escaping. 
-    -->
-    {% if page_content %}
-        {{ page_content | safe }}
-    {% endif %}
-</body>
+<div id="display-pages">
+    <body>
+        <!-- 
+            The if statement checks if the 'pages' variable is defined and not empty. 
+            If it is, a header is displayed, and a bulleted list of links to each page is displayed using a 'for' loop that iterates over the 'pages' variable. 
+        -->
+        {% if pages %}
+        <h1 id="wiki-pages"> Wiki Pages </h1>
+            <ul>
+                {% for page in pages %}
+                <li><a href="/pages/{{ page }}">{{ page }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <!-- 
+            This if statement checks if the 'page_content' variable is defined and not empty. 
+            If it is, the content of the specific page is displayed using the 'safe' fileter to avoid HTML escaping. 
+        -->
+        {% if page_content %}
+            {{ page_content | safe }}
+        {% endif %}
+    </body>
+</div>
 
 {% endblock %}

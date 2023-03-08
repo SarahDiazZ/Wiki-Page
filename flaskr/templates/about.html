@@ -6,26 +6,28 @@ About This Wiki
 
 {% block content %}
 <!-- This code displays the information about the wiki and its authors. -->
-<br><font size= 7><b>About this Wiki</b></font>
+<div id="about-authors">
+    <br><font size= 7><b>About this Wiki</b></font>
 
-<h1></h1>
+    <h1></h1>
 
-<h3>Your Authors</h3>
-<!-- 
-    This block displays information about the authors of the wiki. This includes the names and pictures, which is retrieved from the 'image_datas' variable using base64 encoding.
-    Each author's name is also given an id attribute, which could be useful for linking to specific sections of the page while testing.
- -->
-<div>
-    <h3 id="author-1">Camila Gloria</h3>
-    <img src="data:image/png;base64,{{ image_datas[0] }}" alt="Authors" style="width: 25%; height: auto;">
-</div>
-<div>
-    <h3 id="author-2">Sarah Diaz</h3>
-    <img src="data:image/png;base64,{{ image_datas[1] }}" alt="Authors" style="width: 25%; height: auto;">
-</div>
-<div>
-    <h3 id="author-3">Ricardo Morell</h3>
-    <img src="data:image/png;base64,{{ image_datas[2] }}" alt="Authors" style="width: 25%; height: auto;">
+    <h3>Your Authors</h3>
+    <!-- 
+        This block displays information about the authors of the wiki. This includes the names and pictures, which is retrieved from the 'image_datas' variable using base64 encoding.
+        Each author's name is also given an id attribute, which could be useful for linking to specific sections of the page while testing.
+    -->
+    <div>
+        <h3>Camila Gloria</h3>
+        <img src="data:image/png;base64,{{ image_datas[0] }}" alt="Authors" style="width: 25%; height: auto;">
+    </div>
+    <div>
+        <h3>Sarah Diaz</h3>
+        <img src="data:image/png;base64,{{ image_datas[1] }}" alt="Authors" style="width: 25%; height: auto;">
+    </div>
+    <div>
+        <h3>Ricardo Morell</h3>
+        <img src="data:image/png;base64,{{ image_datas[2] }}" alt="Authors" style="width: 25%; height: auto;">
+    </div>
 </div>
 {% endblock %}
 
