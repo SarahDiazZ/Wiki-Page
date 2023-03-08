@@ -39,4 +39,3 @@ def test_pages(client):
     assert resp.status_code == 200
 
     
-
