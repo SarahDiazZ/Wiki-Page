@@ -6,6 +6,7 @@
         <title>Wiki Server</title>
     </head>
 </head>
+<!-- If the user is not authenticated, the code displays a set of navigation buttons to other pages also welcomes the user to the website. -->
 {% if not current_user.is_authenticated %}
 <div id="not-loggedin-buttons">
     <a href="/">
@@ -25,7 +26,7 @@
         <button>Sign Up</button>
       </a>
 </div>
-
+<!-- On the other hand, if the user is authenticated, the code displays a similar set of navigation buttons, but includes additional buttons for uploading content and logging out. -->
 {% else %}
 <div id="loggedin-buttons">
       <a href="/">

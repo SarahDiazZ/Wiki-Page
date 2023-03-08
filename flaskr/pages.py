@@ -24,8 +24,8 @@ def make_endpoints(app):
         user = User(user_id)
         return user
 
-    """
-    This Flask route function renders the homepage of the website by displaying the 'main.html' template. 
+    """This Flask route function renders the homepage of the website by displaying the 'main.html' template. 
+
     If the user is authenticated, the function retrieves the username of the currently authenticated user 
         and passes it to the template as the 'user_name' variable. 
     If the user is not authenticated, the function doesn't display the 'main.html' template without the 'user_name' variable.
@@ -90,26 +90,28 @@ def make_endpoints(app):
                 flash("No file selected.", category="error")
         return render_template('upload.html')
 
-    """
-    This Flask route function renders a page that displays a list of all available wiki pages by calling the 'be.get_all_page_name()' function. 
-    Then it passes the list of pages names to the HTML template 'pages.html' with 'render_template()'.
+    """This Flask route function renders a page that displays a list of all available wiki pages.
+
+    It displays the wiki pages by calling the 'be.get_all_page_name()' function. Then it passes the list of pages names
+     to the HTML template 'pages.html' with 'render_template()'.
     """
     @app.route("/pages")
     def pages():
         return render_template("pages.html", pages=be.get_all_page_names())
 
-    """
-    This Flask route function retrives the content of a wiki page with the title that is specified in the URL using be.get_wiki_page(). 
-    It then passes the retrived content to the HTML template 'pages.html' via 'render_template()'.
+    """This Flask route function retrives the content of a wiki page.
+
+    It retrieves the content of a wiki page with the title that is specified in the URL using be.get_wiki_page(). It then passes the retrived content 
+    to the HTML template 'pages.html' via 'render_template()'.
     """    
     @app.route("/pages/<page_title>")
     def page_uploads(page_title):
         content = be.get_wiki_page(page_title)
         return render_template("pages.html", page_content=content)
 
-    """ 
-    Flask route function retrieves the images for us three "Camila," "Sarah," and "Ricardo". 
-    This also encodes the images in a Base64 format and passes it to the HTML template that's named 'about.html' via 'render_template()'
+    """Flask route function retrieves the images for us three "Camila," "Sarah," and "Ricardo". 
+
+    The function also encodes the images in a Base64 format and passes it to the HTML template that's named 'about.html' via 'render_template()'
     """
     @app.route("/about")
     def about():

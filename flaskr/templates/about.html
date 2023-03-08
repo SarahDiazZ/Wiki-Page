@@ -5,14 +5,16 @@ About This Wiki
 {% endblock %}
 
 {% block content %}
+<!-- This code displays the information about the wiki and its authors. -->
 <br><font size= 7><b>About this Wiki</b></font>
 
-<!-- TODO(Project 1): Add info about the wiki. -->
 <h1></h1>
 
 <h3>Your Authors</h3>
-
-<!-- TODO(Project 1): Add team members and pictures to about page. -->
+<!-- 
+    This block displays information about the authors of the wiki. This includes the names and pictures, which is retrieved from the 'image_datas' variable using base64 encoding.
+    Each author's name is also given an id attribute, which could be useful for linking to specific sections of the page while testing.
+ -->
 <div>
     <h3 id="author-1">Camila Gloria</h3>
     <img src="data:image/png;base64,{{ image_datas[0] }}" alt="Authors" style="width: 25%; height: auto;">

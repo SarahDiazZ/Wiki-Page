@@ -3,6 +3,12 @@
 {% block content %}
     <br><font size= 4><b>Log In</b></font>
 
+    <!-- 
+        This code is a login form that extens the main.html template. It includes input fields for the username and password with a submit button. 
+        There's also a section of the code that uses the Flash "get_flashed_messages()" funtion to get any flashed messages from previous requests.
+        Error messages are displayed in red and success messages are displayed in green.
+    -->
+
     <form id="login-form" method="POST" action="/login">
         <label for="username">Username:</label>
         <input type="text" id="username" name="Username">
