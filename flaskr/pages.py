@@ -10,15 +10,26 @@ def make_endpoints(app):
     login_manager = LoginManager()
     login_manager.init_app(app)
 
+    """
+    A user using the wiki.
+    Attributes:
+    username: A String containing the username of the user.
+    """
     class User(UserMixin):
+        """Initializes user with given username."""
         def __init__(self, username):
             self.username = username
+
+        """Indicates if the user is logged in or not."""
         @property
         def is_authenticated(self):
             return True
+
+        """Returns the username of the user as their user id."""
         def get_id(self):
             return self.username
 
+    """Gets the current user based on id (username) and returns."""
     @login_manager.user_loader
     def load_user(user_id):
         user = User(user_id)
@@ -38,6 +49,12 @@ def make_endpoints(app):
         else:
             return render_template("main.html")
 
+    """
+    This Flask route function renders the 'signup.html' template if the response is GET. 
+    If the response is POST, the function reads the username and password submitted in the form and calls the backend to create the new account, if possible.
+    If unsuccessful, an error flash message is displayed prompting the user to try a different username. 
+    If successful, a success flash message is displayed prompting the user to login with the username and password they just made.
+    """
     @app.route("/signup", methods = ['GET', 'POST'])
     def signup():
         if request.method == 'POST':
@@ -54,6 +71,12 @@ def make_endpoints(app):
                 flash("Username already exists. Please login or choose a different username.", category="error")
         return render_template('signup.html')
 
+    """
+    This Flask route function renders the 'login.html' template if the response is GET.
+    If the response is POST, the function reads the username and password submitted in the form and calls the backend to check if it's correct.
+    If unsuccessful, an error flash message is displayed prompting the user to try again. 
+    If successful, the user is logged in and redirected to the home page.
+    """
     @app.route("/login", methods = ['GET', 'POST'])
     def login():
         if request.method == 'POST':
@@ -72,11 +95,20 @@ def make_endpoints(app):
                 flash("Invalid username or password. Please try again.", category="error")
         return render_template('login.html')
 
+    """
+    This Flask route function renders the 'logout.html' template and logs out the current authenticated user.
+    """
     @app.route("/logout")
     def logout():
         logout_user()
         return render_template('logout.html')
 
+    """
+    This Flask route function renders the 'upload.html' template if the response is GET.
+    If the response is POST, the function gets the file submitted in the form and passes it to the backend to check if it can be uploaded.
+    If unsuccessful, an error flash message is displayed and the file is not uploaded. 
+    If successful, a success flask message is displayed and the file is uploaded.
+    """
     @login_required
     @app.route("/upload", methods = ['GET', 'POST'])
     def upload():

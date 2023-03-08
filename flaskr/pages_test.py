@@ -55,4 +55,3 @@ def test_about(client, app):
             assert bytes(data, 'utf-8') in response.data
 
     
-
