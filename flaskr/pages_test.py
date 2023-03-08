@@ -3,15 +3,9 @@ from flask import url_for
 from flask import Flask
 from flaskr import backend
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
-from unittest.mock import MagicMock, patch
-import base64
-<<<<<<< HEAD
 from unittest.mock import patch
-from flaskr import backend
-
-=======
+import base64
 import io
->>>>>>> 595de42b2783310125404551b7551178769c6695
 import pytest
 
 # See https://flask.palletsprojects.com/en/2.2.x/testing/ 
@@ -44,60 +38,6 @@ def client(app):
 def test_home_page(client):
     resp = client.get("/")
     assert resp.status_code == 200
-    assert b"<button>Home</button>" in resp.data
-    assert b"<button>About</button>" in resp.data
-    assert b"<button>Pages</button>" in resp.data
-    assert b"<span>   |   </span>" in resp.data
-    assert b"<button>Log In</button>" in resp.data
-    assert b"<button>Sign Up</button>" in resp.data
-    assert b"<span>Welcome to our awesome Wiki Server, we're glad to have you here!</span>" in resp.data
-    assert b"<br><font size= 5><b>The Ultimate Guide to Building a PC</b></font>" in resp.data
-
-
-def test_page_uploads(client):
-    with patch.object(backend.Backend, 'get_wiki_page') as mock_get_wiki_page:
-        #Set the return value of the mock method
-        mock_content = 'Test wiki page content'
-        mock_get_wiki_page.return_value = mock_content
-
-        #Make a GET request to the test URL
-        resp = client.get('/pages/TestPage')
-
-        #check that the response status code is 200
-        assert resp.status_code == 200
-        
-        #Check that the rendered HTML contains the mock content
-        assert mock_content in resp.get_data(as_text=True)
-
-        #Only reason it's navigation-buttons is because in the inspect the id is navigation-buttons
-        assert b"<div id='navigation-buttons'>" in resp.data
-
-
-def test_pages(client):
-    #Mock the get_all_page_names method of the Backend class
-    with patch.object(backend.Backend, 'get_all_page_names') as mock_get_all_page_names:
-        #Set the return value of the mock method
-        mock_page_names = ['Page1', 'Page2', 'Page3']
-        mock_get_all_page_names.return_value = mock_page_names
-
-        #Make a GET request to the test URL
-        resp = client.get('/pages')
-
-        #Check that the response status code is 200
-        assert resp.status_code == 200
-
-        assert b"<div id='display-pages'>" in resp.data
-
-        #Check that the rendered HTML contains the mock page names
-        for page_name in mock_page_names:
-            assert page_name in resp.get_data(as_text=True)
-
-def test_about(client):
-    # image_names = ["camila", "sarah", "ricardo"]
-    with patch.object(backend.Backend, 'get_image') as mock_get_image:
-        mock_get_image.return_value = [b'image_data_1', b'image_data_2', b'image_data_3']
-
-        resp = client.get("/about")
     assert b"<div id='navigation-buttons'>" in resp.data
 
 def test_login_page(client):
@@ -135,16 +75,6 @@ def test_invalid_login(client):
         assert b"Invalid username or password. Please try again." in resp.data
         assert mock_sign_in.called
 
-<<<<<<< HEAD
-    assert b'base64_image_data_1' in resp.data
-    assert b'base64_image_data_2' in resp.data
-    assert b'base64_image_data_3' in resp.data
-
-# TODO(Project 1): Write tests for other routes.
-# def test_pages(client):
-#     resp = client.get("/pages")
-#     assert resp.status_code == 200
-=======
 def test_logout(client):
     with patch('flask_login.utils._get_user') as mock_get_user:
         mock_get_user.return_value = MockUser('test_user')
@@ -205,4 +135,53 @@ def test_no_file_upload(client):
 
     assert resp.status_code == 200
     assert b"No file selected." in resp.data
->>>>>>> 595de42b2783310125404551b7551178769c6695
+
+def test_page_uploads(client):
+    with patch.object(backend.Backend, 'get_wiki_page') as mock_get_wiki_page:
+        #Set the return value of the mock method
+        mock_content = 'Test wiki page content'
+        mock_get_wiki_page.return_value = mock_content
+
+        #Make a GET request to the test URL
+        resp = client.get('/pages/TestPage')
+
+        #check that the response status code is 200
+        assert resp.status_code == 200
+        
+        #Check that the rendered HTML contains the mock content
+        assert mock_content in resp.get_data(as_text=True)
+
+        #Only reason it's navigation-buttons is because in the inspect the id is navigation-buttons
+        assert b"<div id='navigation-buttons'>" in resp.data
+
+def test_pages(client):
+    #Mock the get_all_page_names method of the Backend class
+    with patch.object(backend.Backend, 'get_all_page_names') as mock_get_all_page_names:
+        #Set the return value of the mock method
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+
+        #Make a GET request to the test URL
+        resp = client.get('/pages')
+
+        #Check that the response status code is 200
+        assert resp.status_code == 200
+
+        assert b"<div id='display-pages'>" in resp.data
+
+        #Check that the rendered HTML contains the mock page names
+        for page_name in mock_page_names:
+            assert page_name in resp.get_data(as_text=True)
+
+def test_about(client):
+    # image_names = ["camila", "sarah", "ricardo"]
+    with patch.object(backend.Backend, 'get_image') as mock_get_image:
+        mock_get_image.return_value = [b'image_data_1', b'image_data_2', b'image_data_3']
+
+        resp = client.get("/about")
+    assert resp.status_code == 200
+
+    assert b'base64_image_data_1' in resp.data
+    assert b'base64_image_data_2' in resp.data
+    assert b'base64_image_data_3' in resp.data
+
