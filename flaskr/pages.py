@@ -2,7 +2,6 @@ from flask import render_template, request, redirect, flash
 from flaskr import backend
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 import hashlib
-import base64
 
 
 def make_endpoints(app):
@@ -15,7 +14,9 @@ def make_endpoints(app):
     class User(UserMixin):
         """A user using the wiki.
         
-        Detailed explanation of class and what it implements
+        This class will create a user object for a user who has logged in.
+        It will verify that the current user has been authenticated and is currently still logged in.
+        This object will persist until the user logs out.
 
         Attributes:
             username: A String containing the username of the user.
@@ -29,15 +30,15 @@ def make_endpoints(app):
             """Indicates if the user is logged in or not.
             
             Returns:
-
+                True to indicate that the user is still logged in
             """
             return True
 
         def get_id(self):
-            """Returns the username of the user as their user id.
+            """Passes user id when called.
             
             Returns:
-
+                The username of the user as their user id
             """
             return self.username
 
@@ -46,7 +47,7 @@ def make_endpoints(app):
         """Gets the current user based on id (username) and returns.
         
         Returns:
-
+            Current user object
         """
         user = User(user_id)
         return user
@@ -69,13 +70,14 @@ def make_endpoints(app):
 
     @app.route("/signup", methods = ['GET', 'POST'])
     def signup():
-        """This Flask route function renders the 'signup.html' template if the response is GET. 
-        If the response is POST, the function reads the username and password submitted in the form and calls the backend to create the new account, if possible.
-        If unsuccessful, an error flash message is displayed prompting the user to try a different username. 
-        If successful, a success flash message is displayed prompting the user to login with the username and password they just made.
+        """Allows the user to sign up and create an account. 
+
+        If the response is POST, reads the username and password submitted in the form and calls the backend to create the new account if possible.
+        If unsuccessful, displays error flash message prompting the user to try a different username. 
+        If successful, displays success flash message prompting the user to login.
 
         Returns:
-
+            The 'signup.html' template if the response is GET
         """
         if request.method == 'POST':
             username = request.form['Username']
@@ -93,13 +95,14 @@ def make_endpoints(app):
 
     @app.route("/login", methods = ['GET', 'POST'])
     def login():
-        """This Flask route function renders the 'login.html' template if the response is GET.
-        If the response is POST, the function reads the username and password submitted in the form and calls the backend to check if it's correct.
-        If unsuccessful, an error flash message is displayed prompting the user to try again. 
-        If successful, the user is logged in and redirected to the home page.
+        """Allows the user to enter their username and password to login to their account.
+
+        If the response is POST, reads the username and password submitted in the form and calls the backend to check if it's correct.
+        If unsuccessful, displays error flash message prompting the user to try again. 
+        If successful, logs user in and redirects to home page.
 
         Returns:
-
+            The 'login.html' template if the response is GET
         """
         if request.method == 'POST':
             username = request.form['Username']
@@ -119,10 +122,10 @@ def make_endpoints(app):
 
     @app.route("/logout")
     def logout():
-        """This Flask route function renders the 'logout.html' template and logs out the current authenticated user.
+        """Logs out the current authenticated user.
         
         Returns:
-            
+            The 'logout.html' template
         """
         logout_user()
         return render_template('logout.html')
@@ -130,13 +133,16 @@ def make_endpoints(app):
     @login_required
     @app.route("/upload", methods = ['GET', 'POST'])
     def upload():
-        """This Flask route function renders the 'upload.html' template if the response is GET.
-        If the response is POST, the function gets the file submitted in the form and passes it to the backend to check if it can be uploaded.
-        If unsuccessful, an error flash message is displayed and the file is not uploaded. 
-        If successful, a success flask message is displayed and the file is uploaded.
+        """Allows an authenticated user to upload files to the wiki.
+
+        If the response is POST, gets the file submitted in the form.
+        Checks if the file exists, and if not, displays an error flash message telling user that a file was not selected.
+        If the file exists, passes it to the backend to check if it can be uploaded.
+        If unsuccessful, displays error flash message. 
+        If successful, displays success flask message.
 
         Returns:
-
+            The 'upload.html' template if the response is GET
         """
         if request.method == 'POST':
             file = request.files.get("File")
