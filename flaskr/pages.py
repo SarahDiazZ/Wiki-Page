@@ -5,7 +5,10 @@ import hashlib
 
 
 def make_endpoints(app):
-    """
+    """ This function defines all of the routes that this wiki has
+    
+    This function also initializes a 'backend.Backend()' object and a 'LoginManager()' object. 
+    It associates the 'LoginManager()' object with the Flask 'app' object to manage user authentication.
     """
     be = backend.Backend()
     login_manager = LoginManager()
@@ -60,7 +63,7 @@ def make_endpoints(app):
         If the user is not authenticated, the function doesn't display the 'main.html' template without the 'user_name' variable.
         
         Returns:
-
+            A rendered HTML template 'main.html' which is the homepage of the website.
         """
         if current_user.is_authenticated:
             username = current_user.username
@@ -163,6 +166,7 @@ def make_endpoints(app):
         to the HTML template 'pages.html' with 'render_template()'.
 
         Returns:
+            The rendered HTML template 'pages.html' that displays a list of all available wiki pages.
 
         """
         return render_template("pages.html", pages=be.get_all_page_names())
@@ -175,6 +179,7 @@ def make_endpoints(app):
         to the HTML template 'pages.html' via 'render_template()'.
 
         Returns:
+            The rendered HTML template 'pages.html' with the content of a wiki page        
 
         """   
         content = be.get_wiki_page(page_title)
@@ -186,6 +191,7 @@ def make_endpoints(app):
         The function also encodes the images in a Base64 format and passes it to the HTML template that's named 'about.html' via 'render_template()'
 
         Returns:
+            The rendered HTML template 'about.html'. 
 
         """
         image_names = ["camila", "sarah", "ricardo"]

@@ -53,19 +53,40 @@ def client(app):
     return app.test_client()
 
 def test_home_page(client):
-    """Tests the home page route by asserting that the home page is displayed."""
+    """Tests the home page route by asserting that the home page is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+    
+    Raises:
+        AssertionError if the test fails.
+    """
     resp = client.get("/")
     assert resp.status_code == 200
     assert b"<div id='navigation-buttons'>" in resp.data
 
 def test_login_page(client):
-    """Tests the login route by asserting that the login page is displayed."""
+    """Tests the login route by asserting that the login page is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+    
+    Raises:
+        AssertionError if the test fails.
+    """
     resp = client.get('/login')
     assert resp.status_code == 200
     assert b"<div id='login-page'>" in resp.data
 
 def test_successful_login(client):
-    """Tests the successful login path by creating mock Backend and User objects and asserting that user is logged in and redirected to home page."""
+    """Tests the successful login path by creating mock Backend and User objects and asserting that user is logged in and redirected to home page.
+
+    Args:
+        client: Test client for the Flask app.
+    
+    Raises:
+        AssertionError if the test fails.
+    """
     with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
         mock_sign_in.return_value = True
 
@@ -83,7 +104,14 @@ def test_successful_login(client):
             assert current_user.is_authenticated
 
 def test_unsuccessful_login(client):
-    """Tests the unsuccessful login path by creating a mock Backend object and asserting that error flash message is displayed."""
+    """Tests the unsuccessful login path by creating a mock Backend object and asserting that error flash message is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+    
+    Raises:
+        AssertionError if the test fails.
+    """
     with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
         mock_sign_in.return_value = False
 
@@ -97,7 +125,14 @@ def test_unsuccessful_login(client):
         assert mock_sign_in.called
 
 def test_logout(client):
-    """Tests the logout route by creating a mock User object, logging them out, and asserting that logout page is displayed and user is no longer authenticated."""
+    """Tests the logout route by creating a mock User object, logging them out, and asserting that logout page is displayed and user is no longer authenticated.
+
+    Args:
+        client: Test client for the Flask app.
+    
+    Raises:
+        AssertionError if the test fails.
+    """
     with patch('flask_login.utils._get_user') as mock_get_user:
         mock_get_user.return_value = MockUser('test_user')
 
@@ -115,13 +150,27 @@ def test_logout(client):
         assert current_user.is_authenticated != True
 
 def test_upload_page(client):
-    """Tests the upload route by asserting that the upload page is displayed."""
+    """Tests the upload route by asserting that the upload page is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+    
+    Raises:
+        AssertionError if the test fails.
+    """
     resp = client.get("/upload")
     assert resp.status_code == 200
     assert b"<div id='upload'>" in resp.data
 
 def test_successful_upload(client):
-    """Tests the successful upload path by creating a mock Backend object and mock File, and asserting that success flash message is displayed."""
+    """Tests the successful upload path by creating a mock Backend object and mock File, and asserting that success flash message is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+    
+    Raises:
+        AssertionError if the test fails.
+    """
     with patch.object(backend.Backend, 'upload') as mock_upload:
         mock_upload.return_value = True
         
@@ -139,7 +188,14 @@ def test_successful_upload(client):
         assert b"File uploaded successfully." in resp.data
 
 def test_unsuccessful_upload(client):
-    """Tests the unsuccessful upload path by creating a mock Backend object and mock File, and asserting that correct error flash message is displayed."""
+    """Tests the unsuccessful upload path by creating a mock Backend object and mock File, and asserting that correct error flash message is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+    
+    Raises:
+        AssertionError if the test fails.
+    """
     with patch.object(backend.Backend, 'upload') as mock_upload:
         mock_upload.return_value = False
         
@@ -157,7 +213,14 @@ def test_unsuccessful_upload(client):
         assert b"File name is taken." in resp.data
 
 def test_no_file_upload(client):
-    """Tests the "no file submitted" path by providing a name but no file, and asserting that correct error flash message is displayed."""
+    """Tests the "no file submitted" path by providing a name but no file, and asserting that correct error flash message is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+    
+    Raises:
+        AssertionError if the test fails.
+    """
     resp = client.post('/upload', data={
             'File name': 'dummy_file.png',
         }, content_type='multipart/form-data', follow_redirects=True)
@@ -166,13 +229,27 @@ def test_no_file_upload(client):
     assert b"No file selected." in resp.data
 
 def test_signup_page(client):
-    """Tests the signup route by asserting that the signup page is displayed."""
+    """Tests the signup route by asserting that the signup page is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+
+    Raises:
+        AssertionError if the test fails.
+    """
     resp = client.get("/signup")
     assert resp.status_code == 200
     assert b"<div id='signup-page'>" in resp.data
 
 def test_successful_signup(client):
-    """Tests the successful signup path by creating a mock Backend object and asserting that success flash message is displayed."""
+    """Tests the successful signup path by creating a mock Backend object and asserting that success flash message is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+
+    Raises:
+        AssertionError if the test fails.
+    """
     with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
         mock_sign_up.return_value = True
 
@@ -186,7 +263,14 @@ def test_successful_signup(client):
         assert mock_sign_up.called
 
 def test_unsuccessful_signup(client):
-    """Tests the unsuccessful signup path by creating a mock Backend object and asserting that error flash message is displayed."""
+    """Tests the unsuccessful signup path by creating a mock Backend object and asserting that error flash message is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+
+    Raises:
+        AssertionError if the test fails.
+    """
     with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
         mock_sign_up.return_value = False
 
@@ -200,40 +284,73 @@ def test_unsuccessful_signup(client):
         assert mock_sign_up.called
 
 def test_page_uploads(client):
+    """Tests the pages with parameterized routes route function.
+
+    This function mocks the 'get_wiki_page' method of the Backend class. It ensures that the dummy test page exists.
+
+    Args:
+        client: Test client for the Flask app.
+
+    Raises:
+        AssertionError if the test fails.
+    """
     with patch.object(backend.Backend, 'get_wiki_page') as mock_get_wiki_page:
-        #Set the return value of the mock method
         mock_content = 'Test wiki page content'
         mock_get_wiki_page.return_value = mock_content
 
-        #Make a GET request to the test URL
         resp = client.get('/pages/TestPage')
 
-        #check that the response status code is 200
         assert resp.status_code == 200
-        
-        #Check that the rendered HTML contains the mock content
         assert mock_content in resp.get_data(as_text=True)
-
-        #Only reason it's navigation-buttons is because in the inspect the id is navigation-buttons
         assert b"<div id='navigation-buttons'>" in resp.data
 
 def test_pages(client):
-    #Mock the get_all_page_names method of the Backend class
+    """ Tests the 'pages' route function. 
+
+    This function mocks the 'get_all_page_names' method of the Backend class to return a list of mock page names.
+    
+    Args:
+        client: Test client for the Flask app.
+
+    Raises:
+        AssertionError if the test fails.
+    """    
     with patch.object(backend.Backend, 'get_all_page_names') as mock_get_all_page_names:
-        #Set the return value of the mock method
         mock_page_names = ['Page1', 'Page2', 'Page3']
         mock_get_all_page_names.return_value = mock_page_names
 
-        #Make a GET request to the test URL
         resp = client.get('/pages')
 
-        #Check that the response status code is 200
         assert resp.status_code == 200
 
         assert b"<div id='display-pages'>" in resp.data
 
-        #Check that the rendered HTML contains the mock page names
         for page_name in mock_page_names:
             assert page_name in resp.get_data(as_text=True)
 
+def test_about(client):
+    """ Test the about route function.
 
+    This function tests the behavior of the 'about' Flask route function by mocking the 'get_image' function of the Backend class using path.object().
+
+    Args:
+        client: Test client for the Flask app.
+
+    Raises:
+        AssertionError if the test fails.
+    """
+    
+    with patch.object(backend.Backend, 'get_image') as mock_get_image:
+
+        #Set up mock data thing
+        # mock_get_image.return_value = b'fake image data'
+
+        resp = client.get('/about')
+
+        assert resp.status_code == 200
+
+        #check that images are present in html
+        assert b"<div id='about-authors'>" in resp.data
+        mock_get_image.assert_any_call('camila')
+        mock_get_image.assert_any_call('sarah')
+        mock_get_image.assert_any_call('ricardo')
