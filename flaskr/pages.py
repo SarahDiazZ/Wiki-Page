@@ -183,8 +183,7 @@ def make_endpoints(app):
 
         """
         image_names = ["camila", "sarah", "ricardo"]
-        image_datas = be.get_image(image_names)
-        image_data = [base64.b64encode(image).decode('utf-8') for image in image_datas]
-        return render_template('about.html', image_datas=image_data)
+        image_data = [be.get_image(image_name) for image_name in image_names]
+        return render_template('about.html', image_datas=image_data, base_url="https://storage.cloud.google.com/")
 
         
