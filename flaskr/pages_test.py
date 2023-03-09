@@ -57,9 +57,6 @@ def test_home_page(client):
 
     Args:
         client: Test client for the Flask app.
-    
-    Raises:
-        AssertionError if the test fails.
     """
     resp = client.get("/")
     assert resp.status_code == 200
@@ -70,9 +67,6 @@ def test_login_page(client):
 
     Args:
         client: Test client for the Flask app.
-    
-    Raises:
-        AssertionError if the test fails.
     """
     resp = client.get('/login')
     assert resp.status_code == 200
@@ -83,9 +77,6 @@ def test_successful_login(client):
 
     Args:
         client: Test client for the Flask app.
-    
-    Raises:
-        AssertionError if the test fails.
     """
     with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
         mock_sign_in.return_value = True
@@ -108,9 +99,6 @@ def test_unsuccessful_login(client):
 
     Args:
         client: Test client for the Flask app.
-    
-    Raises:
-        AssertionError if the test fails.
     """
     with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
         mock_sign_in.return_value = False
@@ -129,9 +117,6 @@ def test_logout(client):
 
     Args:
         client: Test client for the Flask app.
-    
-    Raises:
-        AssertionError if the test fails.
     """
     with patch('flask_login.utils._get_user') as mock_get_user:
         mock_get_user.return_value = MockUser('test_user')
@@ -154,9 +139,6 @@ def test_upload_page(client):
 
     Args:
         client: Test client for the Flask app.
-    
-    Raises:
-        AssertionError if the test fails.
     """
     resp = client.get("/upload")
     assert resp.status_code == 200
@@ -167,9 +149,6 @@ def test_successful_upload(client):
 
     Args:
         client: Test client for the Flask app.
-    
-    Raises:
-        AssertionError if the test fails.
     """
     with patch.object(backend.Backend, 'upload') as mock_upload:
         mock_upload.return_value = True
@@ -192,9 +171,6 @@ def test_unsuccessful_upload(client):
 
     Args:
         client: Test client for the Flask app.
-    
-    Raises:
-        AssertionError if the test fails.
     """
     with patch.object(backend.Backend, 'upload') as mock_upload:
         mock_upload.return_value = False
@@ -217,9 +193,6 @@ def test_no_file_upload(client):
 
     Args:
         client: Test client for the Flask app.
-    
-    Raises:
-        AssertionError if the test fails.
     """
     resp = client.post('/upload', data={
             'File name': 'dummy_file.png',
@@ -233,9 +206,6 @@ def test_signup_page(client):
 
     Args:
         client: Test client for the Flask app.
-
-    Raises:
-        AssertionError if the test fails.
     """
     resp = client.get("/signup")
     assert resp.status_code == 200
@@ -246,9 +216,6 @@ def test_successful_signup(client):
 
     Args:
         client: Test client for the Flask app.
-
-    Raises:
-        AssertionError if the test fails.
     """
     with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
         mock_sign_up.return_value = True
@@ -267,9 +234,6 @@ def test_unsuccessful_signup(client):
 
     Args:
         client: Test client for the Flask app.
-
-    Raises:
-        AssertionError if the test fails.
     """
     with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
         mock_sign_up.return_value = False
@@ -290,9 +254,6 @@ def test_page_uploads(client):
 
     Args:
         client: Test client for the Flask app.
-
-    Raises:
-        AssertionError if the test fails.
     """
     with patch.object(backend.Backend, 'get_wiki_page') as mock_get_wiki_page:
         mock_content = 'Test wiki page content'
@@ -311,9 +272,6 @@ def test_pages(client):
     
     Args:
         client: Test client for the Flask app.
-
-    Raises:
-        AssertionError if the test fails.
     """    
     with patch.object(backend.Backend, 'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -335,15 +293,11 @@ def test_about(client):
 
     Args:
         client: Test client for the Flask app.
-
-    Raises:
-        AssertionError if the test fails.
     """
     
     with patch.object(backend.Backend, 'get_image') as mock_get_image:
 
         #Set up mock data thing
-        # mock_get_image.return_value = b'fake image data'
 
         resp = client.get('/about')
 
