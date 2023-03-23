@@ -24,6 +24,7 @@ def make_endpoints(app):
         Attributes:
             username: A String containing the username of the user.
         """
+
         def __init__(self, username):
             """Initializes user with given username."""
             self.username = username
@@ -71,7 +72,7 @@ def make_endpoints(app):
         else:
             return render_template("main.html")
 
-    @app.route("/signup", methods = ['GET', 'POST'])
+    @app.route("/signup", methods=['GET', 'POST'])
     def signup():
         """Allows the user to sign up and create an account. 
 
@@ -89,14 +90,17 @@ def make_endpoints(app):
             with_salt = f"{username}{site_secret}{password}"
             hash = hashlib.blake2b(with_salt.encode()).hexdigest()
             password = hash
-            
+
             if be.sign_up(username, password):
-                flash("Account successfully created! Please login to continue.", category="success")
+                flash("Account successfully created! Please login to continue.",
+                      category="success")
             else:
-                flash("Username already exists. Please login or choose a different username.", category="error")
+                flash(
+                    "Username already exists. Please login or choose a different username.",
+                    category="error")
         return render_template('signup.html')
 
-    @app.route("/login", methods = ['GET', 'POST'])
+    @app.route("/login", methods=['GET', 'POST'])
     def login():
         """Allows the user to enter their username and password to login to their account.
 
@@ -120,7 +124,8 @@ def make_endpoints(app):
                 login_user(user)
                 return redirect('/')
             else:
-                flash("Invalid username or password. Please try again.", category="error")
+                flash("Invalid username or password. Please try again.",
+                      category="error")
         return render_template('login.html')
 
     @app.route("/logout")
@@ -134,7 +139,7 @@ def make_endpoints(app):
         return render_template('logout.html')
 
     @login_required
-    @app.route("/upload", methods = ['GET', 'POST'])
+    @app.route("/upload", methods=['GET', 'POST'])
     def upload():
         """Allows an authenticated user to upload files to the wiki.
 
@@ -170,7 +175,7 @@ def make_endpoints(app):
 
         """
         return render_template("pages.html", pages=be.get_all_page_names())
- 
+
     @app.route("/pages/<page_title>")
     def page_uploads(page_title):
         """This Flask route function retrives the content of a wiki page.
@@ -181,7 +186,7 @@ def make_endpoints(app):
         Returns:
             The rendered HTML template 'pages.html' with the content of a wiki page        
 
-        """   
+        """
         content = be.get_wiki_page(page_title)
         return render_template("pages.html", page_content=content)
 
@@ -196,6 +201,6 @@ def make_endpoints(app):
         """
         image_names = ["camila", "sarah", "ricardo"]
         image_data = [be.get_image(image_name) for image_name in image_names]
-        return render_template('about.html', image_datas=image_data, base_url="https://storage.cloud.google.com/")
-
-        
+        return render_template('about.html',
+                               image_datas=image_data,
+                               base_url="https://storage.cloud.google.com/")
