@@ -13,6 +13,7 @@ unittest:
  stage: test
  script:
  - pip install -r requirements.txt
+ - pip install pytest==6.2.5
  - pytest .
  only:
  - pushes
