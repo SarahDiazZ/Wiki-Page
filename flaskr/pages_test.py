@@ -129,14 +129,14 @@ def test_logout(client):
     """
     with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
         mock_sign_in.return_value = True
-        
+
         with patch('flask_login.utils._get_user') as mock_get_user:
             mock_get_user.return_value = MockUser('test_user')
 
             resp = client.post('/login',
-                                data=dict(Username='test_user',
-                                            Password='test_password'),
-                                follow_redirects=True)
+                               data=dict(Username='test_user',
+                                         Password='test_password'),
+                               follow_redirects=True)
 
             assert current_user.is_authenticated
 
