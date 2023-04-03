@@ -6,7 +6,7 @@ lint:
  - pip install yapf==0.32.0
  - yapf --recursive --diff --style google .
  only:
- - pushes
+ - merge_requests
 
 
 unittest:
@@ -16,7 +16,7 @@ unittest:
  - pip install pytest==6.2.5
  - pytest .
  only:
- - pushes
+ - merge_requests
 
 
 prod:
