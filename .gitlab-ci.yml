@@ -28,4 +28,4 @@ prod:
  script:
  - echo $SERVICE_ACCOUNT > /tmp/$CI_PIPELINE_ID.json
  - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
- - gcloud --quiet --project $team-awesome-project-378001 app deploy
+ - gcloud --quiet --project team-awesome-project-378001 app deploy
