@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html>
 
+    <style>
+        .profile-pic-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        object-fit: cover;
+        }
+    </style>
+
     <div id='navigation-buttons'>
         <head>
             <head>
@@ -46,6 +55,10 @@
             <a href="/logout">
                 <button>Logout</button>
             </a>
+            <a href="/profile">
+                <button>Profile</button>
+            </a>
+            <img class="profile-pic-icon" src="{{ current_user.get_pfp() }}" alt="Profile Picture">
         </div>
         {% endif %}
 

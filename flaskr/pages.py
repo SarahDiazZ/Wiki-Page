@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, flash
 from flaskr import backend
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 import hashlib
+import string
 
 
 def make_endpoints(app):
@@ -45,6 +46,15 @@ def make_endpoints(app):
                 The username of the user as their user id
             """
             return self.username
+        
+        def get_pfp(self):
+            """Summary.
+            
+            Returns:
+                Something.
+            """
+            base_url = "https://storage.cloud.google.com/awesomewikicontent/"
+            return base_url + be.get_profile_pic(self.username)
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -56,21 +66,40 @@ def make_endpoints(app):
         user = User(user_id)
         return user
 
+    def validate_password(password):
+        if len(password) >= 8:
+            specials = ['!','#','*','&','$','@','%','?']
+            nums = ['1','2','3','4','5','6','7','8','9','0']
+            letters = list(string.ascii_letters)
+            has_special = False
+            has_num = False
+            has_letter = False
+
+            for char in password:
+                if char in specials:
+                    has_special = True
+                elif char in nums:
+                    has_num = True
+                elif char in letters:
+                    has_letter = True
+            return has_special and has_num and has_letter
+        else:
+            return False
+    
+    def hash_password(username, password):
+        site_secret = "superduperteamawesome"
+        with_salt = f"{username}{site_secret}{password}"
+        hashed = hashlib.blake2b(with_salt.encode()).hexdigest()
+        return hashed
+
     @app.route("/")
     def home():
         """This Flask route function renders the homepage of the website by displaying the 'main.html' template. 
-
-        If the user is authenticated, the function retrieves the username of the currently authenticated user and passes it to the template as the 'user_name' variable. 
-        If the user is not authenticated, the function doesn't display the 'main.html' template without the 'user_name' variable.
         
         Returns:
             A rendered HTML template 'main.html' which is the homepage of the website.
         """
-        if current_user.is_authenticated:
-            username = current_user.username
-            return render_template("main.html", user_name=username)
-        else:
-            return render_template("main.html")
+        return render_template("main.html")
 
     @app.route("/signup", methods=['GET', 'POST'])
     def signup():
@@ -86,17 +115,17 @@ def make_endpoints(app):
         if request.method == 'POST':
             username = request.form['Username']
             password = request.form['Password']
-            site_secret = "superduperteamawesome"
-            with_salt = f"{username}{site_secret}{password}"
-            hash = hashlib.blake2b(with_salt.encode()).hexdigest()
-            password = hash
+            if validate_password(password):
+                password = hash_password(username, password)
 
-            if be.sign_up(username, password):
-                flash("Account successfully created! Please login to continue.",
-                      category="success")
+                if be.sign_up(username, password):
+                    flash("Account successfully created! Please login to continue.",
+                        category="success")
+                else:
+                    flash("Username already exists. Please login or choose a different username.",
+                        category="error")
             else:
-                flash(
-                    "Username already exists. Please login or choose a different username.",
+                flash("Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol.",
                     category="error")
         return render_template('signup.html')
 
@@ -204,3 +233,107 @@ def make_endpoints(app):
         return render_template('about.html',
                                image_datas=image_data,
                                base_url="https://storage.cloud.google.com/")
+
+    @login_required
+    @app.route("/profile", methods=['GET', 'POST'])
+    def profile():
+        """Summary.
+
+        Returns:
+            The rendered HTML template 'profile.html'.
+
+        """
+        files = be.get_user_files(current_user.username)
+        num_files = len(files)
+        image_name = be.get_profile_pic(current_user.username)
+        image_data = be.get_image(image_name)
+
+        return render_template('profile.html', base_url="https://storage.cloud.google.com/", image_data=image_data, file_num=num_files, files= files)
+    
+    @login_required
+    @app.route("/upload-pfp", methods=['GET', 'POST'])
+    def upload_profile_picture():
+        """Summary.
+
+        Returns:
+            The rendered HTML template 'profile.html'.
+
+        """
+        if request.method == 'POST':
+            pfp = request.files.get("File")
+            if pfp:
+                if be.change_profile_picture(current_user.username, pfp):
+                    flash("Successfully updated your profile picture!", category="success")
+                else:
+                    flash("Error.", category="error")
+            else:
+                flash("No file selected.", category="error")
+
+        return profile()
+
+    @login_required
+    @app.route("/delete", methods=['GET', 'POST'])
+    def delete_file():
+        """Summary.
+
+        Returns:
+            The rendered HTML template 'profile.html'.
+
+        """
+        if request.method == 'POST':
+            file_name = request.form.get('file_name')
+            be.delete_uploaded_file(current_user.username, file_name)
+            flash("Successfully removed file: '" + file_name + "'",
+                category="success")
+        return profile()
+    
+    @login_required
+    @app.route("/change_password", methods=['GET', 'POST'])
+    def change_password():
+        """Summary.
+
+        Returns:
+            The rendered HTML template 'profile.html'.
+
+        """
+        if request.method == 'POST':
+            curr_pass = request.form['CurrentPassword']
+            new_pass = request.form['NewPassword']
+
+            if curr_pass == new_pass:
+                flash("Passwords cannot match. Please try again.",
+                    category="error")
+
+            elif validate_password(new_pass):
+                new_pass = hash_password(current_user.username, new_pass)
+                curr_pass = hash_password(current_user.username, curr_pass)
+
+                if be.change_password(current_user.username, curr_pass, new_pass):
+                    flash("Successfully updated password!",
+                    category="success")
+                else:
+                    flash("Incorrect current password. Please try again.",
+                    category="error")
+            else:
+                flash("Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol.",
+                    category="error")
+
+        return profile()
+            
+    @login_required
+    @app.route("/change_username", methods=['GET', 'POST'])
+    def change_username():
+        """Summary.
+
+        Returns:
+            The rendered HTML template 'profile.html'.
+
+        """
+        if request.method == 'POST':
+            if be.change_username(current_user.username, request.form.get('username')):
+                flash("Successfully updated username!",
+                    category="success")
+            else:
+                flash("Username is already taken. Please try again.",
+                    category="error")
+        return profile()
