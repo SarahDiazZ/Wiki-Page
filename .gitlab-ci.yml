@@ -6,7 +6,7 @@ lint:
  - pip install yapf==0.32.0
  - yapf --recursive --diff --style google .
  only:
- - pushes
+ - merge_requests
 
 
 unittest:
@@ -16,7 +16,7 @@ unittest:
  - pip install pytest==6.2.5
  - pytest .
  only:
- - pushes
+ - merge_requests
 
 
 prod:
@@ -28,4 +28,5 @@ prod:
  script:
  - echo $SERVICE_ACCOUNT > /tmp/$CI_PIPELINE_ID.json
  - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
- - gcloud --quiet --project $team-awesome-project-378001 app deploy
+ - gcloud --quiet --project team-awesome-project-378001 app deploy
+ - gcloud app browse --project=team-awesome-project-378001
