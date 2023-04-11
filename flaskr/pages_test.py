@@ -127,22 +127,24 @@ def test_logout(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch('flask_login.utils._get_user') as mock_get_user:
-        mock_get_user.return_value = MockUser('test_user')
+    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+        mock_sign_in.return_value = True
 
-        resp = client.post('/login',
-                           data=dict(Username='test_user',
-                                     Password='test_password'),
-                           follow_redirects=True)
+        with patch('flask_login.utils._get_user') as mock_get_user:
+            mock_get_user.return_value = MockUser('test_user')
 
-        assert current_user.is_authenticated
+            resp = client.post('/login',
+                               data=dict(Username='test_user',
+                                         Password='test_password1#'),
+                               follow_redirects=True)
 
-        resp = client.get('/logout')
-        assert mock_get_user.called
-        assert resp.status_code == 200
-        assert b"<div id='logout-message'>" in resp.data
-        assert current_user.is_authenticated != True
+            assert current_user.is_authenticated
 
+            resp = client.get('/logout')
+            assert mock_get_user.called
+            assert resp.status_code == 200
+            assert b"<div id='logout-message'>" in resp.data
+            assert current_user.is_authenticated != True
 
 def test_upload_page(client):
     """Tests the upload route by asserting that the upload page is displayed.
