@@ -146,6 +146,7 @@ def test_logout(client):
             assert b"<div id='logout-message'>" in resp.data
             assert current_user.is_authenticated != True
 
+
 def test_upload_page(client):
     """Tests the upload route by asserting that the upload page is displayed.
 
