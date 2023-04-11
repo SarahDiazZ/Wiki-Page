@@ -119,7 +119,7 @@ class Backend:
         blob = self.content_bucket.get_blob(name)
         image = f"{self.content_b}/{blob.name}"
         return image
-    
+
     def get_profile_pic(self, username):
         """Summary.
 
@@ -129,8 +129,8 @@ class Backend:
         Returns:
             Something
         """
-        return "default-profile-pic.gif"
-    
+        return "test.png"
+
     def change_profile_picture(self, username, pfp):
         """Summary.
 
@@ -160,9 +160,9 @@ class Backend:
         if blob.download_as_string().decode() == current_password:
             blob.upload_from_string(new_password)
             return True
-            
+
         return False
-    
+
     def change_username(self, current_username, new_username):
         """Summary.
 
@@ -187,7 +187,7 @@ class Backend:
             Something
         """
         return ["test1.png", "test2.jpg", "test3.html"]
-    
+
     def delete_uploaded_file(self, username, file_name):
         """Summary.
 

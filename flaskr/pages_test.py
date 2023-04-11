@@ -42,7 +42,7 @@ class MockUser:
             The username of the mock user as their user id
         """
         return self.username
-    
+
     def get_pfp(self):
         """Summary.
             
@@ -137,14 +137,14 @@ def test_logout(client):
     """
     with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
         mock_sign_in.return_value = True
-        
+
         with patch('flask_login.utils._get_user') as mock_get_user:
             mock_get_user.return_value = MockUser('test_user')
 
             resp = client.post('/login',
-                                data=dict(Username='test_user',
-                                            Password='test_password1#'),
-                                follow_redirects=True)
+                               data=dict(Username='test_user',
+                                         Password='test_password1#'),
+                               follow_redirects=True)
 
             assert current_user.is_authenticated
 
@@ -291,9 +291,9 @@ def test_invalid_password_signup(client):
         client: Test client for the Flask app.
     """
     resp = client.post('/signup',
-                        data=dict(Username='test_user',
-                                    Password='test_password'),
-                        follow_redirects=True)
+                       data=dict(Username='test_user',
+                                 Password='test_password'),
+                       follow_redirects=True)
 
     assert resp.status_code == 200
     assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
@@ -364,6 +364,7 @@ def test_about(client):
         mock_get_image.assert_any_call('sarah')
         mock_get_image.assert_any_call('ricardo')
 
+
 def test_profile_page(client):
     """Tests the profile route by asserting that the profile page is displayed.
 
@@ -402,18 +403,20 @@ def test_successful_password_change(client):
                                          Password='test_password1#'),
                                follow_redirects=True)
 
-            with patch.object(backend.Backend, 'change_password') as mock_change_password:
+            with patch.object(backend.Backend,
+                              'change_password') as mock_change_password:
                 mock_change_password.return_value = True
-                
+
                 resp = client.post('/change_password',
-                                    data=dict(CurrentPassword='test_password1#',
-                                            NewPassword='test_password2#'),
-                                follow_redirects=True)
-                
+                                   data=dict(CurrentPassword='test_password1#',
+                                             NewPassword='test_password2#'),
+                                   follow_redirects=True)
+
                 assert resp.status_code == 200
                 assert b"Successfully updated password!" in resp.data
                 assert mock_change_password.called
-        
+
+
 def test_same_password(client):
     """Summary.
 
@@ -427,17 +430,18 @@ def test_same_password(client):
             mock_get_user.return_value = MockUser('test_user')
 
             resp = client.post('/login',
-                                data=dict(Username='test_user',
-                                            Password='test_password1#'),
-                                follow_redirects=True)
+                               data=dict(Username='test_user',
+                                         Password='test_password1#'),
+                               follow_redirects=True)
 
             resp = client.post('/change_password',
-                                data=dict(CurrentPassword='test_password1#',
-                                        NewPassword='test_password1#'),
-                                follow_redirects=True)
-            
+                               data=dict(CurrentPassword='test_password1#',
+                                         NewPassword='test_password1#'),
+                               follow_redirects=True)
+
             assert resp.status_code == 200
             assert b"Passwords cannot match. Please try again." in resp.data
+
 
 def test_incorrect_current_password(client):
     """Summary.
@@ -456,17 +460,19 @@ def test_incorrect_current_password(client):
                                          Password='test_password1#'),
                                follow_redirects=True)
 
-            with patch.object(backend.Backend, 'change_password') as mock_change_password:
+            with patch.object(backend.Backend,
+                              'change_password') as mock_change_password:
                 mock_change_password.return_value = False
-                
+
                 resp = client.post('/change_password',
-                                    data=dict(CurrentPassword='test_password2#',
-                                            NewPassword='test_password3#'),
-                                follow_redirects=True)
-                
+                                   data=dict(CurrentPassword='test_password2#',
+                                             NewPassword='test_password3#'),
+                                   follow_redirects=True)
+
                 assert resp.status_code == 200
                 assert b"Incorrect current password. Please try again." in resp.data
                 assert mock_change_password.called
+
 
 def test_invalid_new_password(client):
     """Summary.
@@ -486,9 +492,9 @@ def test_invalid_new_password(client):
                                follow_redirects=True)
 
             resp = client.post('/change_password',
-                                data=dict(CurrentPassword='test_password1#',
-                                        NewPassword='test_password'),
-                            follow_redirects=True)
-            
+                               data=dict(CurrentPassword='test_password1#',
+                                         NewPassword='test_password'),
+                               follow_redirects=True)
+
             assert resp.status_code == 200
             assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data

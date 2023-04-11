@@ -46,7 +46,7 @@ def make_endpoints(app):
                 The username of the user as their user id
             """
             return self.username
-        
+
         def get_pfp(self):
             """Summary.
             
@@ -68,8 +68,8 @@ def make_endpoints(app):
 
     def validate_password(password):
         if len(password) >= 8:
-            specials = ['!','#','*','&','$','@','%','?']
-            nums = ['1','2','3','4','5','6','7','8','9','0']
+            specials = ['!', '#', '*', '&', '$', '@', '%', '?']
+            nums = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
             letters = list(string.ascii_letters)
             has_special = False
             has_num = False
@@ -85,7 +85,7 @@ def make_endpoints(app):
             return has_special and has_num and has_letter
         else:
             return False
-    
+
     def hash_password(username, password):
         site_secret = "superduperteamawesome"
         with_salt = f"{username}{site_secret}{password}"
@@ -119,13 +119,16 @@ def make_endpoints(app):
                 password = hash_password(username, password)
 
                 if be.sign_up(username, password):
-                    flash("Account successfully created! Please login to continue.",
+                    flash(
+                        "Account successfully created! Please login to continue.",
                         category="success")
                 else:
-                    flash("Username already exists. Please login or choose a different username.",
+                    flash(
+                        "Username already exists. Please login or choose a different username.",
                         category="error")
             else:
-                flash("Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol.",
+                flash(
+                    "Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol.",
                     category="error")
         return render_template('signup.html')
 
@@ -246,10 +249,15 @@ def make_endpoints(app):
         files = be.get_user_files(current_user.username)
         num_files = len(files)
         image_name = be.get_profile_pic(current_user.username)
-        image_data = be.get_image(image_name)
+        #image_data = be.get_image(image_name)
+        image_data = "test"
 
-        return render_template('profile.html', base_url="https://storage.cloud.google.com/", image_data=image_data, file_num=num_files, files= files)
-    
+        return render_template('profile.html',
+                               base_url="https://storage.cloud.google.com/",
+                               image_data=image_data,
+                               file_num=num_files,
+                               files=files)
+
     @login_required
     @app.route("/upload-pfp", methods=['GET', 'POST'])
     def upload_profile_picture():
@@ -263,7 +271,8 @@ def make_endpoints(app):
             pfp = request.files.get("File")
             if pfp:
                 if be.change_profile_picture(current_user.username, pfp):
-                    flash("Successfully updated your profile picture!", category="success")
+                    flash("Successfully updated your profile picture!",
+                          category="success")
                 else:
                     flash("Error.", category="error")
             else:
@@ -284,9 +293,9 @@ def make_endpoints(app):
             file_name = request.form.get('file_name')
             be.delete_uploaded_file(current_user.username, file_name)
             flash("Successfully removed file: '" + file_name + "'",
-                category="success")
+                  category="success")
         return profile()
-    
+
     @login_required
     @app.route("/change_password", methods=['GET', 'POST'])
     def change_password():
@@ -302,24 +311,25 @@ def make_endpoints(app):
 
             if curr_pass == new_pass:
                 flash("Passwords cannot match. Please try again.",
-                    category="error")
+                      category="error")
 
             elif validate_password(new_pass):
                 new_pass = hash_password(current_user.username, new_pass)
                 curr_pass = hash_password(current_user.username, curr_pass)
 
-                if be.change_password(current_user.username, curr_pass, new_pass):
-                    flash("Successfully updated password!",
-                    category="success")
+                if be.change_password(current_user.username, curr_pass,
+                                      new_pass):
+                    flash("Successfully updated password!", category="success")
                 else:
                     flash("Incorrect current password. Please try again.",
-                    category="error")
+                          category="error")
             else:
-                flash("Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol.",
+                flash(
+                    "Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol.",
                     category="error")
 
         return profile()
-            
+
     @login_required
     @app.route("/change_username", methods=['GET', 'POST'])
     def change_username():
@@ -330,10 +340,10 @@ def make_endpoints(app):
 
         """
         if request.method == 'POST':
-            if be.change_username(current_user.username, request.form.get('username')):
-                flash("Successfully updated username!",
-                    category="success")
+            if be.change_username(current_user.username,
+                                  request.form.get('username')):
+                flash("Successfully updated username!", category="success")
             else:
                 flash("Username is already taken. Please try again.",
-                    category="error")
+                      category="error")
         return profile()
