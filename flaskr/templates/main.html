@@ -157,3 +157,19 @@
         {% block content %}
             <body>
                 {% if not current_user.is_authenticated %}
+                <p>
+                    <span>Welcome to our awesome Wiki Server, we're glad to have you here!</span>
+                </p>
+            {% else %}
+                <p>
+                    Welcome, <span style = "color:fuchsia"><b>{{ current_user.username }}</b></span>!
+                </p>
+            {% endif %}
+
+            <div id="your_id">
+                <br><font size= 5><b>The Ultimate Guide to Building a PC</b></font>
+            </div>
+        </body>
+    {% endblock %}
+</div>
+</html>

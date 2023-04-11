@@ -127,24 +127,21 @@ def test_logout(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-        mock_sign_in.return_value = True
+    with patch('flask_login.utils._get_user') as mock_get_user:
+        mock_get_user.return_value = MockUser('test_user')
 
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
+        resp = client.post('/login',
+                           data=dict(Username='test_user',
+                                     Password='test_password'),
+                           follow_redirects=True)
 
-            resp = client.post('/login',
-                               data=dict(Username='test_user',
-                                         Password='test_password'),
-                               follow_redirects=True)
+        assert current_user.is_authenticated
 
-            assert current_user.is_authenticated
-
-            resp = client.get('/logout')
-            assert mock_get_user.called
-            assert resp.status_code == 200
-            assert b"<div id='logout-message'>" in resp.data
-            assert current_user.is_authenticated != True
+        resp = client.get('/logout')
+        assert mock_get_user.called
+        assert resp.status_code == 200
+        assert b"<div id='logout-message'>" in resp.data
+        assert current_user.is_authenticated != True
 
 
 def test_upload_page(client):
@@ -345,7 +342,7 @@ def test_about(client):
 def test_about_page_has_search_bar(client):
 
     with patch.object(backend.Backend, 'get_image') as mock_get_image:
-        mock_get_image.return_value = None
+        mock_get_image = None
         response = client.get('/about')
         assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
 
@@ -364,7 +361,6 @@ def test_pages_page_has_search_bar(client):
 
 
 def test_uploaded_page_has_search_bar(client):
-
     with patch.object(backend.Backend, 'get_wiki_page') as mock_get_wiki_page:
         mock_get_wiki_page = None
         response = client.get('/pages/cpu.html')
