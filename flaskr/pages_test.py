@@ -8,8 +8,9 @@ import base64
 import io
 import pytest
 
-# See https://flask.palletsprojects.com/en/2.2.x/testing/ 
+# See https://flask.palletsprojects.com/en/2.2.x/testing/
 # for more info on testing
+
 
 class MockUser:
     """A mock user on the wiki.
@@ -21,6 +22,7 @@ class MockUser:
         Attributes:
             username: A String containing the username of the user.
         """
+
     def __init__(self, username):
         """Initializes user with given username."""
         self.username = username
@@ -41,6 +43,7 @@ class MockUser:
         """
         return self.username
 
+
 @pytest.fixture
 def app():
     app = create_app({
@@ -48,9 +51,11 @@ def app():
     })
     return app
 
+
 @pytest.fixture
 def client(app):
     return app.test_client()
+
 
 def test_home_page(client):
     """Tests the home page route by asserting that the home page is displayed.
@@ -62,6 +67,7 @@ def test_home_page(client):
     assert resp.status_code == 200
     assert b"<div id='navigation-buttons'>" in resp.data
 
+
 def test_login_page(client):
     """Tests the login route by asserting that the login page is displayed.
 
@@ -71,6 +77,7 @@ def test_login_page(client):
     resp = client.get('/login')
     assert resp.status_code == 200
     assert b"<div id='login-page'>" in resp.data
+
 
 def test_successful_login(client):
     """Tests the successful login path by creating mock Backend and User objects and asserting that user is logged in and redirected to home page.
@@ -84,15 +91,16 @@ def test_successful_login(client):
         with patch('flask_login.utils._get_user') as mock_get_user:
             mock_get_user.return_value = MockUser('test_user')
 
-            resp = client.post('/login', data=dict(
-                Username='test_user',
-                Password='test_password'
-            ), follow_redirects=True)
+            resp = client.post('/login',
+                               data=dict(Username='test_user',
+                                         Password='test_password'),
+                               follow_redirects=True)
 
             assert resp.status_code == 200
             assert b"<div id='navigation-buttons'>" in resp.data
             assert mock_sign_in.called
             assert current_user.is_authenticated
+
 
 def test_unsuccessful_login(client):
     """Tests the unsuccessful login path by creating a mock Backend object and asserting that error flash message is displayed.
@@ -103,14 +111,15 @@ def test_unsuccessful_login(client):
     with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
         mock_sign_in.return_value = False
 
-        resp = client.post('/login', data=dict(
-            Username='test_user',
-            Password='test_password'
-        ), follow_redirects=True)
+        resp = client.post('/login',
+                           data=dict(Username='test_user',
+                                     Password='test_password'),
+                           follow_redirects=True)
 
         assert resp.status_code == 200
         assert b"Invalid username or password. Please try again." in resp.data
         assert mock_sign_in.called
+
 
 def test_logout(client):
     """Tests the logout route by creating a mock User object, logging them out, and asserting that logout page is displayed and user is no longer authenticated.
@@ -118,21 +127,25 @@ def test_logout(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch('flask_login.utils._get_user') as mock_get_user:
-        mock_get_user.return_value = MockUser('test_user')
+    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+        mock_sign_in.return_value = True
 
-        resp = client.post('/login', data=dict(
-            Username='test_user',
-            Password='test_password'
-        ), follow_redirects=True)
+        with patch('flask_login.utils._get_user') as mock_get_user:
+            mock_get_user.return_value = MockUser('test_user')
 
-        assert current_user.is_authenticated
+            resp = client.post('/login',
+                               data=dict(Username='test_user',
+                                         Password='test_password'),
+                               follow_redirects=True)
 
-        resp = client.get('/logout')
-        assert mock_get_user.called
-        assert resp.status_code == 200
-        assert b"<div id='logout-message'>" in resp.data
-        assert current_user.is_authenticated != True
+            assert current_user.is_authenticated
+
+            resp = client.get('/logout')
+            assert mock_get_user.called
+            assert resp.status_code == 200
+            assert b"<div id='logout-message'>" in resp.data
+            assert current_user.is_authenticated != True
+
 
 def test_upload_page(client):
     """Tests the upload route by asserting that the upload page is displayed.
@@ -144,6 +157,7 @@ def test_upload_page(client):
     assert resp.status_code == 200
     assert b"<div id='upload'>" in resp.data
 
+
 def test_successful_upload(client):
     """Tests the successful upload path by creating a mock Backend object and mock File, and asserting that success flash message is displayed.
 
@@ -152,19 +166,23 @@ def test_successful_upload(client):
     """
     with patch.object(backend.Backend, 'upload') as mock_upload:
         mock_upload.return_value = True
-        
+
         file_data = b'12345'
         file = io.BytesIO(file_data)
         file.filename = 'dummy_file.png'
 
-        resp = client.post('/upload', data={
-            'File name': 'dummy_file.png',
-            'File': (file, 'dummy_file.png')
-        }, content_type='multipart/form-data', follow_redirects=True)
+        resp = client.post('/upload',
+                           data={
+                               'File name': 'dummy_file.png',
+                               'File': (file, 'dummy_file.png')
+                           },
+                           content_type='multipart/form-data',
+                           follow_redirects=True)
 
         assert resp.status_code == 200
         assert mock_upload.called
         assert b"File uploaded successfully." in resp.data
+
 
 def test_unsuccessful_upload(client):
     """Tests the unsuccessful upload path by creating a mock Backend object and mock File, and asserting that correct error flash message is displayed.
@@ -174,19 +192,23 @@ def test_unsuccessful_upload(client):
     """
     with patch.object(backend.Backend, 'upload') as mock_upload:
         mock_upload.return_value = False
-        
+
         file_data = b'12345'
         file = io.BytesIO(file_data)
         file.filename = 'dummy_file.png'
 
-        resp = client.post('/upload', data={
-            'File name': 'dummy_file.png',
-            'File': (file, 'dummy_file.png')
-        }, content_type='multipart/form-data', follow_redirects=True)
+        resp = client.post('/upload',
+                           data={
+                               'File name': 'dummy_file.png',
+                               'File': (file, 'dummy_file.png')
+                           },
+                           content_type='multipart/form-data',
+                           follow_redirects=True)
 
         assert resp.status_code == 200
         assert mock_upload.called
         assert b"File name is taken." in resp.data
+
 
 def test_no_file_upload(client):
     """Tests the "no file submitted" path by providing a name but no file, and asserting that correct error flash message is displayed.
@@ -194,12 +216,16 @@ def test_no_file_upload(client):
     Args:
         client: Test client for the Flask app.
     """
-    resp = client.post('/upload', data={
-            'File name': 'dummy_file.png',
-        }, content_type='multipart/form-data', follow_redirects=True)
+    resp = client.post('/upload',
+                       data={
+                           'File name': 'dummy_file.png',
+                       },
+                       content_type='multipart/form-data',
+                       follow_redirects=True)
 
     assert resp.status_code == 200
     assert b"No file selected." in resp.data
+
 
 def test_signup_page(client):
     """Tests the signup route by asserting that the signup page is displayed.
@@ -211,6 +237,7 @@ def test_signup_page(client):
     assert resp.status_code == 200
     assert b"<div id='signup-page'>" in resp.data
 
+
 def test_successful_signup(client):
     """Tests the successful signup path by creating a mock Backend object and asserting that success flash message is displayed.
 
@@ -220,14 +247,15 @@ def test_successful_signup(client):
     with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
         mock_sign_up.return_value = True
 
-        resp = client.post('/signup', data=dict(
-                Username='test_user',
-                Password='test_password'
-            ), follow_redirects=True)
+        resp = client.post('/signup',
+                           data=dict(Username='test_user',
+                                     Password='test_password'),
+                           follow_redirects=True)
 
         assert resp.status_code == 200
         assert b"Account successfully created! Please login to continue." in resp.data
         assert mock_sign_up.called
+
 
 def test_unsuccessful_signup(client):
     """Tests the unsuccessful signup path by creating a mock Backend object and asserting that error flash message is displayed.
@@ -238,14 +266,15 @@ def test_unsuccessful_signup(client):
     with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
         mock_sign_up.return_value = False
 
-        resp = client.post('/signup', data=dict(
-                Username='test_user',
-                Password='test_password'
-            ), follow_redirects=True)
+        resp = client.post('/signup',
+                           data=dict(Username='test_user',
+                                     Password='test_password'),
+                           follow_redirects=True)
 
         assert resp.status_code == 200
         assert b"Username already exists. Please login or choose a different username." in resp.data
         assert mock_sign_up.called
+
 
 def test_page_uploads(client):
     """Tests the pages with parameterized routes route function.
@@ -265,6 +294,7 @@ def test_page_uploads(client):
         assert mock_content in resp.get_data(as_text=True)
         assert b"<div id='navigation-buttons'>" in resp.data
 
+
 def test_pages(client):
     """ Tests the 'pages' route function. 
 
@@ -272,8 +302,9 @@ def test_pages(client):
     
     Args:
         client: Test client for the Flask app.
-    """    
-    with patch.object(backend.Backend, 'get_all_page_names') as mock_get_all_page_names:
+    """
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
         mock_get_all_page_names.return_value = mock_page_names
 
@@ -286,6 +317,7 @@ def test_pages(client):
         for page_name in mock_page_names:
             assert page_name in resp.get_data(as_text=True)
 
+
 def test_about(client):
     """ Test the about route function.
 
@@ -294,7 +326,7 @@ def test_about(client):
     Args:
         client: Test client for the Flask app.
     """
-    
+
     with patch.object(backend.Backend, 'get_image') as mock_get_image:
 
         #Set up mock data thing

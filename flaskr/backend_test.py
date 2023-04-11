@@ -4,9 +4,10 @@ import pytest
 
 # TODO(Project 1): Write tests for Backend methods.
 
+
 def test_get_wiki_page():
     """Tests if the get_wiki_page returns the content that is inside of the file."""
-    content = "<div>testing</div>" 
+    content = "<div>testing</div>"
     be = Backend()
 
     blob1 = MagicMock()
@@ -15,6 +16,7 @@ def test_get_wiki_page():
     be.content_bucket.get_blob.return_value = blob1
 
     assert be.get_wiki_page("testing") == content
+
 
 def test_get_all_page_names():
     """Verifies if only the html files are being returned."""
@@ -27,10 +29,10 @@ def test_get_all_page_names():
     blob1.name = html_file
     blob2.name = wrong_file
     be.content_bucket = MagicMock()
-    be.content_bucket.list_blobs.return_value = [blob1,blob2]
-
+    be.content_bucket.list_blobs.return_value = [blob1, blob2]
 
     assert be.get_all_page_names() == [html_file]
+
 
 def test_upload_success():
     """Tests if the upload was successful with no conflict."""
@@ -44,7 +46,8 @@ def test_upload_success():
     be.content_bucket = MagicMock()
     be.content_bucket.blob.return_value = blob1
 
-    assert be.upload("testing",file) == True
+    assert be.upload("testing", file) == True
+
 
 def test_upload_fail():
     """Tests if the upload fails when a file with the same name already exists."""
@@ -57,7 +60,8 @@ def test_upload_fail():
     be.content_bucket = MagicMock()
     be.content_bucket.blob.return_value = blob1
 
-    assert be.upload("testing",file) == False
+    assert be.upload("testing", file) == False
+
 
 def test_sign_up_success():
     """Tests the sign up was successful and there is no username that is taken."""
@@ -70,6 +74,7 @@ def test_sign_up_success():
 
     assert be.sign_up("user", "password") == True
 
+
 def test_sign_up_fail():
     """Tests if the sign up was not possible because the username is taken."""
     be = Backend()
@@ -80,6 +85,7 @@ def test_sign_up_fail():
     be.password_bucket.blob.return_value = blob1
 
     assert be.sign_up("user", "password") == False
+
 
 def test_sign_in_success():
     """Tests if the sign in was successful, username exists and the password matches."""
@@ -94,6 +100,7 @@ def test_sign_in_success():
 
     assert be.sign_in("user", correct) == True
 
+
 def test_sign_in_fail_does_not_exist():
     """Tests if the sign in was not possible because the username does not exists."""
     correct = "password"
@@ -105,6 +112,7 @@ def test_sign_in_fail_does_not_exist():
     be.password_bucket.get_blob.return_value = blob1
 
     assert be.sign_in("user", correct) == False
+
 
 def test_sign_in_fail_match():
     """Tests if the sign in username exists, but the password does not match."""
@@ -120,6 +128,7 @@ def test_sign_in_fail_match():
 
     assert be.sign_in("user", correct) == False
 
+
 def test_get_image():
     """"""
     be = Backend()
@@ -129,5 +138,5 @@ def test_get_image():
     blob1.name = img
     be.content_bucket = MagicMock()
     be.content_bucket.get_blob.return_value = blob1
-    
+
     assert be.get_image(img) == f"awesomewikicontent/{img}"

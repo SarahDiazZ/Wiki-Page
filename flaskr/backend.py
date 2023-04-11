@@ -3,6 +3,7 @@ from google.cloud import storage
 
 # Create mock backend in file to test.
 
+
 class Backend:
     """Retrieves and modifies data from GCS using two buckets, one for passwords and another for content.
 
@@ -17,6 +18,7 @@ class Backend:
         content_bucket: connection to the content bucket on GCS.
         password_bucket: connection to the password bucket on GCS.
     """
+
     def __init__(self):
         """Initializes the GCS and sets the password and content bucket."""
         self.storage_client = storage.Client()
@@ -24,7 +26,7 @@ class Backend:
         self.content_b = "awesomewikicontent"
         self.password_bucket = self.storage_client.bucket(self.password_b)
         self.content_bucket = self.storage_client.bucket(self.content_b)
-        
+
     def get_wiki_page(self, name):
         """Using the name passed as argument, it will retrieve the data from GCS that corresponds to that file.
 
