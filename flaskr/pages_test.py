@@ -71,13 +71,11 @@ def test_home_page(client):
 def test_image_gallery(client):
     """
     """
-    with patch.object(backend.Backend, 'get_contributors') as contributors:
-        contributors.return_value = ["Testing User1", "Testing User2"]
-        resp = client.get("/")
-        assert resp.status_code == 200
-        assert b'<div class="carousel-inner">' in resp.data
-        assert b'Testing User1' in resp.data
-        assert b'Testing User2' in resp.data
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert b'<div class="carousel-inner">' in resp.data
+    assert b'Testing User1' in resp.data
+    assert b'Testing User2' in resp.data
 
 
 def test_login_page(client):
