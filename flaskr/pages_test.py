@@ -98,21 +98,22 @@ def test_successful_login(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-        mock_sign_in.return_value = True
+    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+            mock_sign_in.return_value = True
 
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
 
-            resp = client.post('/login',
-                               data=dict(Username='test_user',
-                                         Password='test_password1#'),
-                               follow_redirects=True)
+                resp = client.post('/login',
+                                   data=dict(Username='test_user',
+                                             Password='test_password'),
+                                   follow_redirects=True)
 
-            assert resp.status_code == 200
-            assert b"<div id='navigation-buttons'>" in resp.data
-            assert mock_sign_in.called
-            assert current_user.is_authenticated
+                assert resp.status_code == 200
+                assert b"<div id='navigation-buttons'>" in resp.data
+                assert mock_sign_in.called
+                assert current_user.is_authenticated
 
 
 def test_unsuccessful_login(client):
@@ -140,24 +141,25 @@ def test_logout(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-        mock_sign_in.return_value = True
+    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+            mock_sign_in.return_value = True
 
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
 
-            resp = client.post('/login',
-                               data=dict(Username='test_user',
-                                         Password='test_password1#'),
-                               follow_redirects=True)
+                resp = client.post('/login',
+                                   data=dict(Username='test_user',
+                                             Password='test_password'),
+                                   follow_redirects=True)
 
-            assert current_user.is_authenticated
+                assert current_user.is_authenticated
 
-            resp = client.get('/logout')
-            assert mock_get_user.called
-            assert resp.status_code == 200
-            assert b"<div id='logout-message'>" in resp.data
-            assert current_user.is_authenticated != True
+                resp = client.get('/logout')
+                assert mock_get_user.called
+                assert resp.status_code == 200
+                assert b"<div id='logout-message'>" in resp.data
+                assert current_user.is_authenticated != True
 
 
 def test_upload_page(client):
