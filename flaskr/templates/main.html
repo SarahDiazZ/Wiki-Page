@@ -65,6 +65,13 @@
                     <br><font size= 5><b>The Ultimate Guide to Building a PC</b></font>
                 </div>
             </body>
+            <div id="contributors">
+                <p>Contributors:</p>
+                {% for contributor in contributors %}
+                    <li>{{ contributor }}</li>
+                {% endfor %}
+            </div>
+
         {% endblock %}
     </div>
 </html>

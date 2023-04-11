@@ -4,6 +4,7 @@ from flask import Flask
 from flaskr import backend
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from unittest.mock import patch
+from unittest.mock import MagicMock
 import base64
 import io
 import pytest
@@ -66,6 +67,27 @@ def test_home_page(client):
     resp = client.get("/")
     assert resp.status_code == 200
     assert b"<div id='navigation-buttons'>" in resp.data
+
+
+def test_get_contributors():
+    """"""
+    be = backend.Backend()
+    blob1 = MagicMock()
+    json_test_data = {
+        "testing": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": []
+        }
+    }
+    expected = ["testing"]
+    blob1.download_as_bytes.decode.return_value = '{"testing": {"profile_pic": "default-profile-pic.gif", "files_uploaded": []}}'
+
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = blob1
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load:
+        mock_load.return_value = json_test_data
+        assert be.get_contributors() == expected
 
 
 def test_login_page(client):

@@ -1,5 +1,6 @@
 # TODO(Project 1): Implement Backend according to the requirements.
 from google.cloud import storage
+import json
 
 # Create mock backend in file to test.
 
@@ -120,3 +121,14 @@ class Backend:
         blob = self.content_bucket.get_blob(name)
         image = f"{self.content_b}/{blob.name}"
         return image
+
+    def get_contributors(self):
+        """
+        """
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        contributors = []
+        for contributor in json_dict.keys():
+            contributors.append(contributor)
+        return contributors
