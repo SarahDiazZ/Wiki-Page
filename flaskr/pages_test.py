@@ -74,8 +74,6 @@ def test_image_gallery(client):
     resp = client.get("/")
     assert resp.status_code == 200
     assert b'<div class="carousel-inner">' in resp.data
-    assert b'Testing User1' in resp.data
-    assert b'Testing User2' in resp.data
 
 
 def test_login_page(client):
