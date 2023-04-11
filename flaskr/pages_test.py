@@ -64,30 +64,21 @@ def test_home_page(client):
     Args:
         client: Test client for the Flask app.
     """
-    resp = client.get("/")
-    assert resp.status_code == 200
-    assert b"<div id='navigation-buttons'>" in resp.data
+    with patch.object(backend.Backend, 'get_contributors') as get_contributors:
+        get_contributors.return_value = []
+        resp = client.get("/")
+        assert resp.status_code == 200
+        assert b"<div id='navigation-buttons'>" in resp.data
 
 
-def test_get_contributors():
+def test_contributors(client):
     """"""
-    be = backend.Backend()
-    blob1 = MagicMock()
-    json_test_data = {
-        "testing": {
-            "profile_pic": "default-profile-pic.gif",
-            "files_uploaded": []
-        }
-    }
-    expected = ["testing"]
-    blob1.download_as_bytes.decode.return_value = '{"testing": {"profile_pic": "default-profile-pic.gif", "files_uploaded": []}}'
-
-    be.content_bucket = MagicMock()
-    be.content_bucket.get_blob.return_value = blob1
-
-    with patch('json.loads', new_callable=MagicMock) as mock_load:
-        mock_load.return_value = json_test_data
-        assert be.get_contributors() == expected
+    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        get_contributor.return_value = ["testing_contributor"]
+        resp = client.get("/")
+        assert resp.status_code == 200
+        assert b'<div id="contributors">' in resp.data
+        assert b"testing_contributor" in resp.data
 
 
 def test_login_page(client):
@@ -115,7 +106,7 @@ def test_successful_login(client):
 
             resp = client.post('/login',
                                data=dict(Username='test_user',
-                                         Password='test_password'),
+                                         Password='test_password1#'),
                                follow_redirects=True)
 
             assert resp.status_code == 200
@@ -157,7 +148,7 @@ def test_logout(client):
 
             resp = client.post('/login',
                                data=dict(Username='test_user',
-                                         Password='test_password'),
+                                         Password='test_password1#'),
                                follow_redirects=True)
 
             assert current_user.is_authenticated
