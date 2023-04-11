@@ -308,3 +308,35 @@ def test_about(client):
         mock_get_image.assert_any_call('camila')
         mock_get_image.assert_any_call('sarah')
         mock_get_image.assert_any_call('ricardo')
+
+def test_about_page_has_search_bar(client):
+    response = client.get('/about')
+    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+
+def test_home_page_has_search_bar(client):
+    response = client.get('/')
+    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    
+def test_pages_page_has_search_bar(client):
+    response = client.get('/pages')
+    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+
+def test_uploaded_page_has_search_bar(client):
+    response = client.get('/pages/cpu.html')
+    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+
+def test_upload_page_has_search_bar(client):
+    response = client.get('/upload')
+    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+
+def test_logout_page_has_search_bar(client):
+    response = client.get('/logout')
+    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+
+def test_login_page_has_search_bar(client):
+    response = client.get('/login')
+    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+
+def test_signup_page_has_search_bar(client):
+    response = client.get('/signup')
+    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data

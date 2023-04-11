@@ -10,7 +10,7 @@ def test_get_wiki_page():
     be = Backend()
 
     blob1 = MagicMock()
-    blob1.download_as_string().decode.return_value = content
+    blob1.download_as_bytes().decode.return_value = content
     be.content_bucket = MagicMock()
     be.content_bucket.get_blob.return_value = blob1
 
@@ -88,7 +88,7 @@ def test_sign_in_success():
 
     blob3 = MagicMock()
     blob3.return_value = True
-    blob3.download_as_string().decode.return_value = correct
+    blob3.download_as_bytes().decode.return_value = correct
     be.password_bucket = MagicMock()
     be.password_bucket.get_blob.return_value = blob3
 
