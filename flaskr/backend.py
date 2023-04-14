@@ -37,7 +37,7 @@ class Backend:
             A string with all the content of the wiki page requested.
         """
         blob = self.content_bucket.get_blob(name)
-        return blob.download_as_string().decode()
+        return blob.download_as_bytes().decode()
 
     def get_all_page_names(self):
         """Retrieves all the uploaded pages from GCS.
@@ -104,7 +104,7 @@ class Backend:
         if not blob:
             return False
         else:
-            if blob.download_as_string().decode() == password:
+            if blob.download_as_bytes().decode() == password:
                 return True
             return False
 
