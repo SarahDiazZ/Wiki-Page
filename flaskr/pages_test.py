@@ -420,7 +420,7 @@ def test_signup_page_has_search_bar(client):
     response = client.get('/signup')
     assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
 
-    
+
 def test_profile_page(client):
     """Tests the profile route by asserting that the profile page is displayed.
 
