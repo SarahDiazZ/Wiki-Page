@@ -1,4 +1,3 @@
-# TODO(Project 1): Implement Backend according to the requirements.
 from google.cloud import storage
 
 # Create mock backend in file to test.
@@ -37,7 +36,7 @@ class Backend:
             A string with all the content of the wiki page requested.
         """
         blob = self.content_bucket.get_blob(name)
-        return blob.download_as_string().decode()
+        return blob.download_as_bytes().decode()
 
     def get_all_page_names(self):
         """Retrieves all the uploaded pages from GCS.
@@ -104,7 +103,7 @@ class Backend:
         if not blob:
             return False
         else:
-            if blob.download_as_string().decode() == password:
+            if blob.download_as_bytes().decode() == password:
                 return True
             return False
 
@@ -120,3 +119,83 @@ class Backend:
         blob = self.content_bucket.get_blob(name)
         image = f"{self.content_b}/{blob.name}"
         return image
+
+    def get_profile_pic(self, username):
+        """Summary.
+
+        Args:
+            username:
+
+        Returns:
+            Something
+        """
+        return "test.png"
+
+    def change_profile_picture(self, username, pfp):
+        """Summary.
+
+        Args:
+            username:
+            pfp:
+
+        Returns:
+            Something
+        """
+        return True
+
+    def change_password(self, username, current_password, new_password):
+        """Summary.
+
+        Args:
+            username: 
+            current_password:
+            new_password:
+
+        Returns:
+            True if the current password is correct and password is updated.
+            False if current password is incorrect and password was not updated.
+        """
+        blob = self.password_bucket.get_blob(username)
+
+        if blob.download_as_string().decode() == current_password:
+            blob.upload_from_string(new_password)
+            return True
+
+        return False
+
+    def change_username(self, current_username, new_username):
+        """Summary.
+
+        Args:
+            username:
+            current_username:
+            new_username:
+
+        Returns:
+            True if.
+            False if.
+        """
+        return True
+
+    def get_user_files(self, username):
+        """Summary.
+
+        Args:
+            username:
+
+        Returns:
+            Something
+        """
+        return ["test1.png", "test2.jpg", "test3.html"]
+
+    def delete_uploaded_file(self, username, file_name):
+        """Summary.
+
+        Args:
+            username:
+            file_name:
+
+        Returns:
+            Nothing.
+        """
+        pass
