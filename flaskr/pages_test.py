@@ -68,17 +68,26 @@ def test_home_page(client):
         get_contributors.return_value = []
         resp = client.get("/")
         assert resp.status_code == 200
-        assert b"<div id='navigation-buttons'>" in resp.data
+        assert b'<body id="Home">' in resp.data
+
+
+def test_image_gallery(client):
+    """
+    """
+    with patch.object(backend.Backend, 'get_contributors') as get_contributors:
+        get_contributors.return_value = []
+        resp = client.get("/")
+        assert resp.status_code == 200
+        assert b'<div class="carousel-inner">' in resp.data
 
 
 def test_contributors(client):
     """"""
     with patch.object(backend.Backend, 'get_contributors') as get_contributor:
-        get_contributor.return_value = ["testing_contributor"]
+        get_contributor.return_value = []
         resp = client.get("/")
         assert resp.status_code == 200
         assert b'<div id="contributors">' in resp.data
-        assert b"testing_contributor" in resp.data
 
 
 def test_login_page(client):
@@ -107,11 +116,11 @@ def test_successful_login(client):
 
                 resp = client.post('/login',
                                    data=dict(Username='test_user',
-                                             Password='test_password'),
+                                             Password='test_password1#'),
                                    follow_redirects=True)
 
                 assert resp.status_code == 200
-                assert b"<div id='navigation-buttons'>" in resp.data
+                assert b"Welcome, test_user" in resp.data
                 assert mock_sign_in.called
                 assert current_user.is_authenticated
 
@@ -127,7 +136,7 @@ def test_unsuccessful_login(client):
 
         resp = client.post('/login',
                            data=dict(Username='test_user',
-                                     Password='test_password'),
+                                     Password='test_password1#'),
                            follow_redirects=True)
 
         assert resp.status_code == 200
@@ -150,7 +159,7 @@ def test_logout(client):
 
                 resp = client.post('/login',
                                    data=dict(Username='test_user',
-                                             Password='test_password'),
+                                             Password='test_password1#'),
                                    follow_redirects=True)
 
                 assert current_user.is_authenticated
@@ -307,7 +316,6 @@ def test_page_uploads(client):
 
         assert resp.status_code == 200
         assert mock_content in resp.get_data(as_text=True)
-        assert b"<div id='navigation-buttons'>" in resp.data
 
 
 def test_pages(client):

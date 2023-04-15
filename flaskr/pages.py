@@ -66,14 +66,8 @@ def make_endpoints(app):
         Returns:
             A rendered HTML template 'main.html' which is the homepage of the website.
         """
-        if current_user.is_authenticated:
-            username = current_user.username
-            return render_template("main.html",
-                                   user_name=username,
-                                   contributors=be.get_contributors())
-        else:
-            return render_template("main.html",
-                                   contributors=be.get_contributors())
+        return render_template("main.html",
+                                contributors=be.get_contributors())
 
     @app.route("/signup", methods=['GET', 'POST'])
     def signup():
