@@ -120,7 +120,7 @@ def test_successful_login(client):
                                    follow_redirects=True)
 
                 assert resp.status_code == 200
-                assert b"Welcome, test_user" in resp.data
+                assert b'Welcome, <span style = "color:fuchsia"><b>test_user</b></span>!' in resp.data
                 assert mock_sign_in.called
                 assert current_user.is_authenticated
 

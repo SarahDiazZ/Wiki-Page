@@ -66,8 +66,7 @@ def make_endpoints(app):
         Returns:
             A rendered HTML template 'main.html' which is the homepage of the website.
         """
-        return render_template("main.html",
-                                contributors=be.get_contributors())
+        return render_template("main.html", contributors=be.get_contributors())
 
     @app.route("/signup", methods=['GET', 'POST'])
     def signup():
