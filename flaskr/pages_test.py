@@ -443,19 +443,20 @@ def test_profile_page(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-        mock_sign_in.return_value = True
+    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+            mock_sign_in.return_value = True
 
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
 
-            resp = client.post('/login',
-                               data=dict(Username='test_user',
-                                         Password='test_password1#'),
-                               follow_redirects=True)
-            resp = client.get("/profile")
-            assert resp.status_code == 200
-            assert b"<div id='profile-page'>" in resp.data
+                resp = client.post('/login',
+                                data=dict(Username='test_user',
+                                            Password='test_password1#'),
+                                follow_redirects=True)
+                resp = client.get("/profile")
+                assert resp.status_code == 200
+                assert b"<div id='profile-page'>" in resp.data
 
 
 def test_successful_password_change(client):
@@ -464,29 +465,30 @@ def test_successful_password_change(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-        mock_sign_in.return_value = True
+    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+            mock_sign_in.return_value = True
 
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
 
-            resp = client.post('/login',
-                               data=dict(Username='test_user',
-                                         Password='test_password1#'),
-                               follow_redirects=True)
+                resp = client.post('/login',
+                                data=dict(Username='test_user',
+                                            Password='test_password1#'),
+                                follow_redirects=True)
 
-            with patch.object(backend.Backend,
-                              'change_password') as mock_change_password:
-                mock_change_password.return_value = True
+                with patch.object(backend.Backend,
+                                'change_password') as mock_change_password:
+                    mock_change_password.return_value = True
 
-                resp = client.post('/change_password',
-                                   data=dict(CurrentPassword='test_password1#',
-                                             NewPassword='test_password2#'),
-                                   follow_redirects=True)
+                    resp = client.post('/change_password',
+                                    data=dict(CurrentPassword='test_password1#',
+                                                NewPassword='test_password2#'),
+                                    follow_redirects=True)
 
-                assert resp.status_code == 200
-                assert b"Successfully updated password!" in resp.data
-                assert mock_change_password.called
+                    assert resp.status_code == 200
+                    assert b"Successfully updated password!" in resp.data
+                    assert mock_change_password.called
 
 
 def test_same_password(client):
@@ -495,24 +497,25 @@ def test_same_password(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-        mock_sign_in.return_value = True
+    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+            mock_sign_in.return_value = True
 
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
 
-            resp = client.post('/login',
-                               data=dict(Username='test_user',
-                                         Password='test_password1#'),
-                               follow_redirects=True)
+                resp = client.post('/login',
+                                data=dict(Username='test_user',
+                                            Password='test_password1#'),
+                                follow_redirects=True)
 
-            resp = client.post('/change_password',
-                               data=dict(CurrentPassword='test_password1#',
-                                         NewPassword='test_password1#'),
-                               follow_redirects=True)
+                resp = client.post('/change_password',
+                                data=dict(CurrentPassword='test_password1#',
+                                            NewPassword='test_password1#'),
+                                follow_redirects=True)
 
-            assert resp.status_code == 200
-            assert b"Passwords cannot match. Please try again." in resp.data
+                assert resp.status_code == 200
+                assert b"Passwords cannot match. Please try again." in resp.data
 
 
 def test_incorrect_current_password(client):
@@ -521,29 +524,30 @@ def test_incorrect_current_password(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-        mock_sign_in.return_value = True
+    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+            mock_sign_in.return_value = True
 
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
 
-            resp = client.post('/login',
-                               data=dict(Username='test_user',
-                                         Password='test_password1#'),
-                               follow_redirects=True)
+                resp = client.post('/login',
+                                data=dict(Username='test_user',
+                                            Password='test_password1#'),
+                                follow_redirects=True)
 
-            with patch.object(backend.Backend,
-                              'change_password') as mock_change_password:
-                mock_change_password.return_value = False
+                with patch.object(backend.Backend,
+                                'change_password') as mock_change_password:
+                    mock_change_password.return_value = False
 
-                resp = client.post('/change_password',
-                                   data=dict(CurrentPassword='test_password2#',
-                                             NewPassword='test_password3#'),
-                                   follow_redirects=True)
+                    resp = client.post('/change_password',
+                                    data=dict(CurrentPassword='test_password2#',
+                                                NewPassword='test_password3#'),
+                                    follow_redirects=True)
 
-                assert resp.status_code == 200
-                assert b"Incorrect current password. Please try again." in resp.data
-                assert mock_change_password.called
+                    assert resp.status_code == 200
+                    assert b"Incorrect current password. Please try again." in resp.data
+                    assert mock_change_password.called
 
 
 def test_invalid_new_password(client):
@@ -552,21 +556,22 @@ def test_invalid_new_password(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-        mock_sign_in.return_value = True
+    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+            mock_sign_in.return_value = True
 
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
 
-            resp = client.post('/login',
-                               data=dict(Username='test_user',
-                                         Password='test_password1#'),
-                               follow_redirects=True)
+                resp = client.post('/login',
+                                data=dict(Username='test_user',
+                                            Password='test_password1#'),
+                                follow_redirects=True)
 
-            resp = client.post('/change_password',
-                               data=dict(CurrentPassword='test_password1#',
-                                         NewPassword='test_password'),
-                               follow_redirects=True)
+                resp = client.post('/change_password',
+                                data=dict(CurrentPassword='test_password1#',
+                                            NewPassword='test_password'),
+                                follow_redirects=True)
 
-            assert resp.status_code == 200
-            assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
+                assert resp.status_code == 200
+                assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
