@@ -482,8 +482,9 @@ def test_successful_password_change(client):
                     mock_change_password.return_value = True
 
                     resp = client.post('/change_password',
-                                       data=dict(CurrentPassword='test_password1#',
-                                                 NewPassword='test_password2#'),
+                                       data=dict(
+                                           CurrentPassword='test_password1#',
+                                           NewPassword='test_password2#'),
                                        follow_redirects=True)
 
                     assert resp.status_code == 200
@@ -541,8 +542,9 @@ def test_incorrect_current_password(client):
                     mock_change_password.return_value = False
 
                     resp = client.post('/change_password',
-                                       data=dict(CurrentPassword='test_password2#',
-                                                 NewPassword='test_password3#'),
+                                       data=dict(
+                                           CurrentPassword='test_password2#',
+                                           NewPassword='test_password3#'),
                                        follow_redirects=True)
 
                     assert resp.status_code == 200
