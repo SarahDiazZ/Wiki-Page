@@ -130,7 +130,7 @@ def test_sign_in_fail_match():
 
 
 def test_get_image():
-    """"""
+    """Tests getting an image from Google Cloud."""
     be = Backend()
 
     img = "testing.jpg"
