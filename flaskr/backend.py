@@ -1,4 +1,3 @@
-# TODO(Project 1): Implement Backend according to the requirements.
 from google.cloud import storage
 
 # Create mock backend in file to test.

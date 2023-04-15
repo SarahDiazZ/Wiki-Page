@@ -2,6 +2,11 @@
 <html>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css">
+
+
     <div id='navigation-buttons'>
         <head>
             <head>
@@ -83,23 +88,6 @@
         </head>
         <!-- If the user is not authenticated, the code displays a set of navigation buttons to other pages also welcomes the user to the website. -->
         {% if not current_user.is_authenticated %}
-        <div>
-            <a href="/">
-                <button>Home</button>
-            </a>
-            <a href="/about">
-                <button>About</button>
-            </a>
-            <a href="/pages">
-                <button>Pages</button>
-            </a>
-            <span>   |   </span>
-            <a href="/login">
-                <button>Log In</button>
-            </a>
-            <a href="/signup">
-                <button>Sign Up</button>
-            </a>
         <div class="topnav">
             <a href="/">Home</a>
 
@@ -114,23 +102,6 @@
         </div>
         <!-- On the other hand, if the user is authenticated, the code displays a similar set of navigation buttons, but includes additional buttons for uploading content and logging out. -->
         {% else %}
-        <div>
-            <a href="/">
-                <button>Home</button>
-            </a>
-            <a href="/pages">
-                <button>Pages</button>
-            </a>
-            <a href="/about">
-                <button>About</button>
-            </a>
-            <span>|  {{ current_user.username }}   |</span>
-            <a href="/upload">
-                <button>Upload</button>
-            </a>
-            <a href="/logout">
-                <button>Logout</button>
-            </a>
         <div class="topnav">
             <a href="/">Home</a>
 
@@ -147,12 +118,55 @@
         </div>
         {% endif %}
 
-        <form action="/" method="get" class="topnav">
+        <!-- The form action part is what redirects the user to another page when they press on the magnifying button  -->        
+        <form action="/pages" method="get" class="topnav">
             <div class="search-container">
-                <input type="text" placeholder="Search for a PC part" name="search">
+                <input type="text" class="form-control" placeholder="Search for a PC part"  id="input-datalist" autocomplete="off"> <!-- 'list=' is list in html -->
                 <button type="submit"><i class="fa fa-search"></i></button>
+               
             </div>
         </form>
+
+
+            <datalist id="list-timezone">
+                {% for page in pages %}
+                <option value="{{ page }}" data-url="/pages/{{ page }}">{{ page }}</option>                
+                {% endfor %}
+            </datalist>
+
+            <!-- This only works when we're in the /pages route due to the wiki page list showing up when the user was inside an article -->
+            <datalist id="list-timezone">
+                {% for page in wiki_pages %}
+                <option value="{{ page }}" data-url="/pages/{{ page }}">{{ page }}</option>                
+                {% endfor %}
+            </datalist>
+      
+
+        <script>
+            $(function() {
+                $('#input-datalist').autocomplete({
+                    source: function(request, response) {
+                        const options = $('#list-timezone option');
+                        const results = $.map(options, function(option) {
+                            const value = option.value;
+                            if (value.toLowerCase().startsWith(request.term.toLowerCase())) {
+                                return {
+                                    label: value,
+                                    value: value,
+                                    url: option.getAttribute('data-url')
+                                };
+                            }
+                        });
+                        response(results);
+                    },
+                    select: function(event, ui) {
+                        window.location.href = ui.item.url;
+                        return false;
+                    }
+                });
+            });
+        </script>
+        
         
         {% block content %}
             <body>
