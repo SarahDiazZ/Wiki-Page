@@ -50,7 +50,7 @@
         <br><font size= 4><b>Account Info</b></font>
         <br>
         <br>
-        <img class="profile-pic" src={{ base_url }}{{ image_data }} alt="Profile picture">
+        <img class="profile-pic" src="{{ current_user.get_pfp() }}"
         <br>
         <button><a href="#change-pfp">Change Profile Picture</a></button>
         <br>

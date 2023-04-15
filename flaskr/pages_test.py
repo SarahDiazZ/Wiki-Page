@@ -397,8 +397,9 @@ def test_about_page_has_search_bar(client):
 
 
 def test_home_page_has_search_bar(client):
-    response = client.get('/')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        response = client.get('/')
+        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
 
 
 def test_pages_page_has_search_bar(client):
@@ -452,9 +453,9 @@ def test_profile_page(client):
                                data=dict(Username='test_user',
                                          Password='test_password1#'),
                                follow_redirects=True)
-    resp = client.get("/profile")
-    assert resp.status_code == 200
-    assert b"<div id='profile-page'>" in resp.data
+            resp = client.get("/profile")
+            assert resp.status_code == 200
+            assert b"<div id='profile-page'>" in resp.data
 
 
 def test_successful_password_change(client):
