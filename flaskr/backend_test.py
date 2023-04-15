@@ -1,5 +1,6 @@
 from flaskr.backend import Backend
 from unittest.mock import MagicMock
+from unittest.mock import patch
 import pytest
 
 # TODO(Project 1): Write tests for Backend methods.
@@ -140,3 +141,24 @@ def test_get_image():
     be.content_bucket.get_blob.return_value = blob1
 
     assert be.get_image(img) == f"awesomewikicontent/{img}"
+
+
+def test_get_contributors():
+    """"""
+    be = Backend()
+    blob1 = MagicMock()
+    json_test_data = {
+        "testing": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": []
+        }
+    }
+    expected = ["testing"]
+    blob1.download_as_bytes.decode.return_value = '{"testing": {"profile_pic": "default-profile-pic.gif", "files_uploaded": []}}'
+
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = blob1
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load:
+        mock_load.return_value = json_test_data
+        assert be.get_contributors() == expected

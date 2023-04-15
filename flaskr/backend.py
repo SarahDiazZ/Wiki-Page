@@ -1,4 +1,6 @@
 from google.cloud import storage
+import json
+import random
 
 # Create mock backend in file to test.
 
@@ -199,3 +201,14 @@ class Backend:
             Nothing.
         """
         pass
+
+    def get_contributors(self):
+        """
+        """
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        contributors = []
+        for contributor in json_dict.keys():
+            contributors.append(contributor)
+        return contributors

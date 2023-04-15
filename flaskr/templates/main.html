@@ -146,7 +146,7 @@
                     <br><font size= 5><b>The Ultimate Guide to Building a PC</b></font>
                 </div>
             </body>
-                <body id="imageGallery">
+            <body id="imageGallery">
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
                 <style>
                 .css-item {
@@ -163,7 +163,7 @@
                 <div id="computerCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <div class="carousel-item active css-item" data-bs-interval="5000">
-                    <img src="https://storage.cloud.google.com/awesomewikicontent/PinkSetup.png" class="d-block w-100 css-img" alt="slide1">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/peripherals.jpeg" class="d-block w-100 css-img" alt="slide1">
                     <div class="carousel-caption d-none d-md-block">
                         <h5>First slide label</h5>
                         <p>Some representative placeholder content for the first slide.</p>
@@ -171,7 +171,7 @@
                 
                     </div>
                     <div class="carousel-item css-item" data-bs-interval="5000">
-                    <img src="https://storage.cloud.google.com/awesomewikicontent/SwitchSetup.jpg" class="d-block w-100 css-img" alt="slide2">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/ceo_of_cs.jpg" class="d-block w-100 css-img" alt="slide2">
                     <div class="carousel-caption d-none d-md-block">
                         <h5>Second slide label</h5>
                         <p>Some representative placeholder content for the first slide.</p>
@@ -179,7 +179,7 @@
                 
                     </div>
                     <div class="carousel-item css-item" data-bs-interval="5000">
-                    <img src="https://storage.cloud.google.com/awesomewikicontent/studioGhibli.jpg" class="d-block w-100 css-img" alt="slide3">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/kitty.jpg" class="d-block w-100 css-img" alt="slide3">
                     <div class="carousel-caption d-none d-md-block">
                         <h5>Third slide label</h5>
                         <p>Some representative placeholder content for the first slide.</p>
@@ -199,6 +199,12 @@
                 
                 </div>
             </body>
+            <div id="contributors">
+                <p>Contributors:</p>
+                {% for contributor in contributors %}
+                    <li>{{ contributor }}</li>
+                {% endfor %}
+            </div>
 
         {% endblock %}
     </div>
