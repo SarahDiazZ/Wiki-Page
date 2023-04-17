@@ -54,7 +54,7 @@ def make_endpoints(app):
             Returns:
                 Something.
             """
-            base_url = "https://storage.cloud.google.com/"
+            base_url = "https://storage.cloud.google.com/awesomewikicontent/"
             return base_url + be.get_profile_pic(self.username)
 
     @login_manager.user_loader
@@ -100,16 +100,9 @@ def make_endpoints(app):
         Returns:
             A rendered HTML template 'main.html' which is the homepage of the website.
         """
-        if current_user.is_authenticated:
-            username = current_user.username
-            return render_template("main.html",
-                                   user_name=username,
-                                   pages=be.get_all_page_names())
-        else:
-            return render_template("main.html",
+        return render_template("main.html",
                                    pages=be.get_all_page_names(),
                                    contributors=be.get_contributors())
-        # return render_template("main.html", contributors=be.get_contributors(), pages=be.get_all_page_names())
 
     @app.route("/signup", methods=['GET', 'POST'])
     def signup():
