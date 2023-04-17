@@ -54,7 +54,7 @@ def make_endpoints(app):
             Returns:
                 Something.
             """
-            base_url = "https://storage.cloud.google.com/awesomewikicontent/"
+            base_url = "https://storage.cloud.google.com/"
             return base_url + be.get_profile_pic(self.username)
 
     @login_manager.user_loader
