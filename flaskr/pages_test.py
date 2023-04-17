@@ -586,11 +586,15 @@ def test_invalid_new_password(client):
                 assert resp.status_code == 200
                 assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
 
+
 def test_search_page(client):
     """
     """
-    resp = client.post('/search-results',
-                        data=dict(SearchInput='p', MatchingResults='"psu.html,peripherals.html,pc-basics.html"'), follow_redirects=True)
+    resp = client.post(
+        '/search-results',
+        data=dict(SearchInput='p',
+                  MatchingResults='"psu.html,peripherals.html,pc-basics.html"'),
+        follow_redirects=True)
     assert resp.status_code == 200
     assert b"<div id='search-results'>" in resp.data
     assert b"psu.html" in resp.data
