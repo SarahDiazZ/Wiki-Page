@@ -1,7 +1,6 @@
 from flaskr.backend import Backend
 from unittest.mock import MagicMock
 from unittest.mock import patch
-from io import BytesIO
 import pytest
 
 
