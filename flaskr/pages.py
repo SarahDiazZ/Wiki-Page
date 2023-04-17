@@ -347,3 +347,11 @@ def make_endpoints(app):
                 flash("Username is already taken. Please try again.",
                       category="error")
         return profile()
+    
+    @app.route('/search-results', methods=['POST'])
+    def search_results():
+        search_input = request.form['SearchInput']
+        matching_results = request.form['MatchingResults']
+        suggested_pages = matching_results.split(',')
+        
+        return render_template('search.html', suggestions=suggested_pages, search_value=search_input)    

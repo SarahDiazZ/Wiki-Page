@@ -393,13 +393,13 @@ def test_about_page_has_search_bar(client):
     with patch.object(backend.Backend, 'get_image') as mock_get_image:
         mock_get_image = None
         response = client.get('/about')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+        assert b'<input type="text" class="form-control" placeholder="Search for a PC part"' in response.data
 
 
 def test_home_page_has_search_bar(client):
     with patch.object(backend.Backend, 'get_contributors') as get_contributor:
         response = client.get('/')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+        assert b'<input type="text" class="form-control" placeholder="Search for a PC part"' in response.data
 
 
 def test_pages_page_has_search_bar(client):
@@ -407,34 +407,42 @@ def test_pages_page_has_search_bar(client):
                       'get_all_page_names') as mock_get_all_page_names:
         mock_get_all_page_names = None
         response = client.get('/pages')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+        assert b'<input type="text" class="form-control" placeholder="Search for a PC part"' in response.data
 
 
 def test_uploaded_page_has_search_bar(client):
     with patch.object(backend.Backend, 'get_wiki_page') as mock_get_wiki_page:
         mock_get_wiki_page = None
         response = client.get('/pages/cpu.html')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+        assert b'<input type="text" class="form-control" placeholder="Search for a PC part"' in response.data
 
 
 def test_upload_page_has_search_bar(client):
     response = client.get('/upload')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    assert b'<input type="text" class="form-control" placeholder="Search for a PC part"' in response.data
 
 
 def test_logout_page_has_search_bar(client):
     response = client.get('/logout')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    assert b'<input type="text" class="form-control" placeholder="Search for a PC part"' in response.data
 
 
 def test_login_page_has_search_bar(client):
     response = client.get('/login')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    assert b'<input type="text" class="form-control" placeholder="Search for a PC part"' in response.data
 
 
 def test_signup_page_has_search_bar(client):
     response = client.get('/signup')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    assert b'<input type="text" class="form-control" placeholder="Search for a PC part"' in response.data
+
+
+def test_profile_page_has_search_bar(client):
+    with patch('flask_login.utils._get_user') as mock_get_user:
+        mock_get_user.return_value = MockUser('test_user')
+
+        response = client.get('/profile')
+        assert b'<input type="text" class="form-control" placeholder="Search for a PC part"' in response.data
 
 
 def test_profile_page(client):
@@ -577,3 +585,14 @@ def test_invalid_new_password(client):
 
                 assert resp.status_code == 200
                 assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
+
+def test_search_page(client):
+    """
+    """
+    resp = client.post('/search-results',
+                        data=dict(SearchInput='p', MatchingResults='"psu.html,peripherals.html,pc-basics.html"'), follow_redirects=True)
+    assert resp.status_code == 200
+    assert b"<div id='search-results'>" in resp.data
+    assert b"psu.html" in resp.data
+    assert b"peripherals.html" in resp.data
+    assert b"pc-basics.html" in resp.data

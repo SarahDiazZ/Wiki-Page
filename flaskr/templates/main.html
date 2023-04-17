@@ -123,12 +123,48 @@
         </div>
         {% endif %}
 
-        <form action="/" method="get" class="topnav">
+        <form action="/search-results" method="POST" class="topnav">
             <div class="search-container">
-                <input type="text" placeholder="Search for a PC part" name="search">
+                <input type="text" class="form-control" placeholder="Search for a PC part" id="input-datalist" autocomplete="off" name="SearchInput">
+                <input type="hidden" name="MatchingResults" id="matching-results" value="{{results}}"">
                 <button type="submit"><i class="fa fa-search"></i></button>
             </div>
         </form>
+        
+        <script>
+            $(function() {
+                $('#input-datalist').autocomplete({
+                    source: function(request, response) {
+                        const options = $('#list-timezone option');
+                        const results = $.map(options, function(option) {
+                            const value = option.value;
+                            if (value.toLowerCase().startsWith(request.term.toLowerCase())) {
+                                return {
+                                    label: value,
+                                    value: value,
+                                    url: option.getAttribute('data-url')
+                                };
+                            }
+                        }).slice(0, 3);
+                        response(results);
+                    },
+                    select: function(event, ui) {
+                        window.location.href = ui.item.url;
+                        return false;
+                    }
+                });
+            
+                $('form.topnav').on('submit', function() {
+                    var results = [];
+                    $('datalist#list-timezone option').each(function() {
+                        if ($(this).val().toLowerCase().indexOf($('#input-datalist').val().toLowerCase()) >= 0) {
+                            results.push($(this).val());
+                        }
+                    });
+                    $('#matching-results').val(results.join(','));
+                });
+            });
+        </script>
         
         {% block content %}
             <body id="Home">
