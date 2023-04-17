@@ -123,6 +123,8 @@ class Backend:
         return image
 
     def get_profile_pic(self, username):
+        '''
+        '''
         json_blob = self.content_bucket.get_blob("info.json")
         json_str = json_blob.download_as_bytes().decode()
         json_dict = json.loads(json_str)
