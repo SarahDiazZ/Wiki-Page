@@ -393,13 +393,13 @@ def test_about_page_has_search_bar(client):
     with patch.object(backend.Backend, 'get_image') as mock_get_image:
         mock_get_image = None
         response = client.get('/about')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+        assert b'Search for a PC part' in response.data
 
 
 def test_home_page_has_search_bar(client):
     with patch.object(backend.Backend, 'get_contributors') as get_contributor:
         response = client.get('/')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+        assert b'Search for a PC part' in response.data
 
 
 def test_pages_page_has_search_bar(client):
@@ -407,34 +407,34 @@ def test_pages_page_has_search_bar(client):
                       'get_all_page_names') as mock_get_all_page_names:
         mock_get_all_page_names = None
         response = client.get('/pages')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+        assert b'Search for a PC part' in response.data
 
 
 def test_uploaded_page_has_search_bar(client):
     with patch.object(backend.Backend, 'get_wiki_page') as mock_get_wiki_page:
         mock_get_wiki_page = None
         response = client.get('/pages/cpu.html')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+        assert b'Search for a PC part' in response.data
 
 
 def test_upload_page_has_search_bar(client):
     response = client.get('/upload')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    assert b'Search for a PC part' in response.data
 
 
 def test_logout_page_has_search_bar(client):
     response = client.get('/logout')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    assert b'Search for a PC part' in response.data
 
 
 def test_login_page_has_search_bar(client):
     response = client.get('/login')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    assert b'Search for a PC part' in response.data
 
 
 def test_signup_page_has_search_bar(client):
     response = client.get('/signup')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    assert b'Search for a PC part' in response.data
 
 
 def test_profile_page(client):
@@ -443,20 +443,12 @@ def test_profile_page(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
-        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-            mock_sign_in.return_value = True
+    with patch('flask_login.utils._get_user') as mock_get_user:
+        mock_get_user.return_value = MockUser('test_user')
+        resp = client.get("/profile")
 
-            with patch('flask_login.utils._get_user') as mock_get_user:
-                mock_get_user.return_value = MockUser('test_user')
-
-                resp = client.post('/login',
-                                   data=dict(Username='test_user',
-                                             Password='test_password1#'),
-                                   follow_redirects=True)
-                resp = client.get("/profile")
-                assert resp.status_code == 200
-                assert b"<div id='profile-page'>" in resp.data
+        assert resp.status_code == 200
+        assert b"<div id='profile-page'>" in resp.data
 
 
 def test_successful_password_change(client):

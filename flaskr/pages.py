@@ -102,9 +102,13 @@ def make_endpoints(app):
         """
         if current_user.is_authenticated:
             username = current_user.username
-            return render_template("main.html", user_name=username, pages=be.get_all_page_names())
+            return render_template("main.html",
+                                   user_name=username,
+                                   pages=be.get_all_page_names())
         else:
-            return render_template("main.html", pages=be.get_all_page_names(), contributors=be.get_contributors())
+            return render_template("main.html",
+                                   pages=be.get_all_page_names(),
+                                   contributors=be.get_contributors())
         # return render_template("main.html", contributors=be.get_contributors(), pages=be.get_all_page_names())
 
     @app.route("/signup", methods=['GET', 'POST'])
@@ -225,9 +229,11 @@ def make_endpoints(app):
             The rendered HTML template 'pages.html' with the content of a wiki page        
 
         """
-        
+
         content = be.get_wiki_page(page_title)
-        return render_template("pages.html", page_content=content, pages=be.get_all_page_names())
+        return render_template("pages.html",
+                               page_content=content,
+                               pages=be.get_all_page_names())
 
     @app.route("/about")
     def about():
@@ -242,7 +248,8 @@ def make_endpoints(app):
         image_data = [be.get_image(image_name) for image_name in image_names]
         return render_template('about.html',
                                image_datas=image_data,
-                               base_url="https://storage.cloud.google.com/", pages=be.get_all_page_names())
+                               base_url="https://storage.cloud.google.com/",
+                               pages=be.get_all_page_names())
 
     @login_required
     @app.route("/profile", methods=['GET', 'POST'])
@@ -255,15 +262,11 @@ def make_endpoints(app):
         """
         files = be.get_user_files(current_user.username)
         num_files = len(files)
-        image_name = be.get_profile_pic(current_user.username)
-        #image_data = be.get_image(image_name)
-        image_data = "test"
 
         return render_template('profile.html',
-                               base_url="https://storage.cloud.google.com/",
-                               image_data=image_data,
                                file_num=num_files,
-                               files=files)
+                               files=files,
+                               pages=be.get_all_page_names())
 
     @login_required
     @app.route("/upload-pfp", methods=['GET', 'POST'])
