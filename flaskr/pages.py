@@ -53,7 +53,8 @@ def make_endpoints(app):
             Returns:
                 Something.
             """
-            return "https://storage.cloud.google.com/awesomewikicontent/" + be.get_profile_pic(self.username)
+            return "https://storage.cloud.google.com/awesomewikicontent/" + be.get_profile_pic(
+                self.username)
 
     @login_manager.user_loader
     def load_user(user_id):
