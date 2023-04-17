@@ -123,15 +123,10 @@ class Backend:
         return image
 
     def get_profile_pic(self, username):
-        """Summary.
-
-        Args:
-            username:
-
-        Returns:
-            Something
-        """
-        return "test.png"
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        return json_dict[username]["profile_pic"]
 
     def change_profile_picture(self, username, pfp):
         """Summary.
