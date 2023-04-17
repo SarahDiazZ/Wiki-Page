@@ -87,18 +87,7 @@ class Backend:
         if blob.exists():
             return False
         else:
-            blob.upload_from_string(password,
-                                    content_type="application/octet-stream")
-            json_blob = self.content_bucket.blob("info.json")
-            json_str = json_blob.download_as_bytes().decode()
-            json_dict = json.loads(json_str)
-            profile = "default-profile-pic.gif"
-            if random.randint(1, 20) == 2:
-                profile = "default-profile-pic2.gif"
-            json_dict[username] = {"profile_pic": profile, "files_uploaded": []}
-            json_data = json.dumps(json_dict)
-            json_blob.upload_from_string(json_data,
-                                         content_type="application/json")
+            blob.upload_from_string(password)
             return True
 
     def sign_in(self, username, password):
