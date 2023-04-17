@@ -72,30 +72,45 @@ def test_home_page(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'get_contributors') as get_contributors:
-        get_contributors.return_value = []
-        resp = client.get("/")
-        assert resp.status_code == 200
-        assert b'<body id="Home">' in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributors:
+            get_contributors.return_value = []
+            resp = client.get("/")
+            assert resp.status_code == 200
+            assert b'<body id="Home">' in resp.data
 
 
 def test_image_gallery(client):
     """
     """
-    with patch.object(backend.Backend, 'get_contributors') as get_contributors:
-        get_contributors.return_value = []
-        resp = client.get("/")
-        assert resp.status_code == 200
-        assert b'<div class="carousel-inner">' in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributors:
+            get_contributors.return_value = []
+            resp = client.get("/")
+            assert resp.status_code == 200
+            assert b'<div class="carousel-inner">' in resp.data
 
 
 def test_contributors(client):
     """"""
-    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
-        get_contributor.return_value = []
-        resp = client.get("/")
-        assert resp.status_code == 200
-        assert b'<div id="contributors">' in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
+            get_contributor.return_value = []
+            resp = client.get("/")
+            assert resp.status_code == 200
+            assert b'<div id="contributors">' in resp.data
 
 
 def test_login_page(client):
