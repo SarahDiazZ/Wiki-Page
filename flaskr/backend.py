@@ -123,26 +123,47 @@ class Backend:
         return image
 
     def get_profile_pic(self, username):
+        #TODO
+        return "default-profile-pic.gif"
+
+    def change_profile_picture(self, username, new_pfp, remove):
         """Summary.
 
         Args:
-            username:
+            username: 
+            new_pfp:
+            remove:
 
         Returns:
-            Something
+            True if
+            False if
         """
-        return "test.png"
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        old_pfp = json_dict[username]["profile_pic"]
+        old_blob = self.content_bucket.get_blob(old_pfp)        
 
-    def change_profile_picture(self, username, pfp):
-        """Summary.
+        if remove:
+            old_blob.delete()
+            json_dict[username]["profile_pic"] = "default-profile-pic.gif"
+    
+        else:
+            file_type = new_pfp.filename.split(".")[-1]
 
-        Args:
-            username:
-            pfp:
+            if file_type not in ["png","jpeg","jpg","gif"]:
+                return False
+            
+            if old_pfp != "default-profile-pic.gif" and old_pfp != "default-profile-pic2.gif":
+                old_blob.delete()
 
-        Returns:
-            Something
-        """
+            file_name = f"{username}-profile-picture-superduperteamawesome.{file_type}"
+            blob = self.content_bucket.blob(file_name)
+            blob.upload_from_file(new_pfp)
+            json_dict[username]["profile_pic"] = file_name
+
+        mod_json_data = json.dumps(json_dict)
+        json_blob.upload_from_string(mod_json_data, content_type="application/json")
         return True
 
     def change_password(self, username, current_password, new_password):
@@ -166,40 +187,15 @@ class Backend:
         return False
 
     def change_username(self, current_username, new_username):
-        """Summary.
-
-        Args:
-            username:
-            current_username:
-            new_username:
-
-        Returns:
-            True if.
-            False if.
-        """
+        #TODO
         return True
 
     def get_user_files(self, username):
-        """Summary.
-
-        Args:
-            username:
-
-        Returns:
-            Something
-        """
+        #TODO
         return ["test1.png", "test2.jpg", "test3.html"]
 
     def delete_uploaded_file(self, username, file_name):
-        """Summary.
-
-        Args:
-            username:
-            file_name:
-
-        Returns:
-            Nothing.
-        """
+        #TODO
         pass
 
     def get_contributors(self):

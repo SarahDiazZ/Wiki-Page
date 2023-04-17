@@ -1,9 +1,8 @@
 from flaskr.backend import Backend
 from unittest.mock import MagicMock
 from unittest.mock import patch
+from io import BytesIO
 import pytest
-
-# TODO(Project 1): Write tests for Backend methods.
 
 
 def test_get_wiki_page():
@@ -162,3 +161,126 @@ def test_get_contributors():
     with patch('json.loads', new_callable=MagicMock) as mock_load:
         mock_load.return_value = json_test_data
         assert be.get_contributors() == expected
+
+
+def test_change_password_success():
+    """
+    """
+    be = Backend()
+    blob = MagicMock()
+    blob.return_value = True
+    blob.download_as_string().decode.return_value = "password"
+    be.password_bucket = MagicMock()
+    be.password_bucket.get_blob.return_value = blob
+
+    assert be.change_password("test_user", "password", "new_password") == True
+
+
+def test_change_password_fail():
+    """
+    """
+    be = Backend()
+    blob = MagicMock()
+    blob.return_value = True
+    blob.download_as_string().decode.return_value = "password"
+    be.password_bucket = MagicMock()
+    be.password_bucket.get_blob.return_value = blob
+
+    assert be.change_password("test_user", "wrong_password", "new_password") == False
+
+
+def test_change_profile_picture_success():
+    """
+    """
+    be = Backend()
+    new_pfp = MagicMock()
+    new_pfp.filename.split.return_value = ["new_pfp", "png"]
+
+    json_test_data = {
+        "test_user": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": []
+        }
+    }
+
+    expected = {
+        "test_user": {
+            "profile_pic": "test_user-profile-picture-superduperteamawesome.png",
+            "files_uploaded": []
+        }
+    }
+    
+    blob = MagicMock()
+    blob.download_as_bytes.decode.return_value = json_test_data
+
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = blob
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load:
+        mock_load.return_value = json_test_data
+        assert be.change_profile_picture("test_user", new_pfp, False) == True
+        assert json_test_data == expected
+
+
+def test_change_profile_picture_fail():
+    """
+    """
+    be = Backend()
+    new_pfp = MagicMock()
+    new_pfp.filename.split.return_value = ["new_pfp", "html"]
+
+    json_test_data = {
+        "test_user": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": []
+        }
+    }
+
+    expected = {
+        "test_user": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": []
+        }
+    }
+    
+    blob = MagicMock()
+    blob.download_as_bytes.decode.return_value = json_test_data
+
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = blob
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load:
+        mock_load.return_value = json_test_data
+        assert be.change_profile_picture("test_user", new_pfp, False) == False
+        assert json_test_data == expected
+
+
+def test_remove_profile_picture():
+    """
+    """
+    be = Backend()
+
+    json_test_data = {
+        "test_user": {
+            "profile_pic": "test_pfp.png",
+            "files_uploaded": []
+        }
+    }
+    
+    expected = {
+        "test_user": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": []
+        }
+    }
+
+    blob = MagicMock()
+    blob.download_as_bytes.decode.return_value = json_test_data
+
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = blob
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load:
+        mock_load.return_value = json_test_data
+        assert be.change_profile_picture("test_user", None, True) == True
+        assert json_test_data == expected

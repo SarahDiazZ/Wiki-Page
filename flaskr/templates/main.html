@@ -119,7 +119,7 @@
 
             <a href="/logout">Logout</a>
 
-            <a href="/profile">|  {{ current_user.username }}   <img class="profile-pic-icon" src="{{ current_user.get_pfp() }}" alt="Profile Picture">|</a>
+            <a href="/profile">|  {{ current_user.username }}   <img class="profile-pic-icon" src="{{ current_user.get_profile_picture() }}" alt="Profile Picture">|</a>
         </div>
         {% endif %}
 

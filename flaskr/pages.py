@@ -47,7 +47,7 @@ def make_endpoints(app):
             """
             return self.username
 
-        def get_pfp(self):
+        def get_profile_picture(self):
             """Summary.
             
             Returns:
@@ -68,9 +68,9 @@ def make_endpoints(app):
 
     def validate_password(password):
         if len(password) >= 8:
-            specials = ['!', '#', '*', '&', '$', '@', '%', '?']
-            nums = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
-            letters = list(string.ascii_letters)
+            specials = string.punctuation
+            nums = string.digits
+            letters = string.ascii_letters
             has_special = False
             has_num = False
             has_letter = False
@@ -83,8 +83,7 @@ def make_endpoints(app):
                 elif char in letters:
                     has_letter = True
             return has_special and has_num and has_letter
-        else:
-            return False
+        return False
 
     def hash_password(username, password):
         site_secret = "superduperteamawesome"
@@ -119,8 +118,10 @@ def make_endpoints(app):
                 password = hash_password(username, password)
 
                 if be.sign_up(username, password):
+                    user = User(username)
+                    login_user(user)
                     flash(
-                        "Account successfully created! Please login to continue.",
+                        "Account successfully created!",
                         category="success")
                 else:
                     flash(
@@ -248,15 +249,10 @@ def make_endpoints(app):
         """
         files = be.get_user_files(current_user.username)
         num_files = len(files)
-        image_name = be.get_profile_pic(current_user.username)
-        #image_data = be.get_image(image_name)
-        image_data = "test"
 
         return render_template('profile.html',
-                               base_url="https://storage.cloud.google.com/",
-                               image_data=image_data,
                                file_num=num_files,
-                               files=files)
+                               files=files, default="https://storage.cloud.google.com/awesomewikicontent/default-profile-pic.gif")
 
     @login_required
     @app.route("/upload-pfp", methods=['GET', 'POST'])
@@ -270,13 +266,29 @@ def make_endpoints(app):
         if request.method == 'POST':
             pfp = request.files.get("File")
             if pfp:
-                if be.change_profile_picture(current_user.username, pfp):
-                    flash("Successfully updated your profile picture!",
-                          category="success")
+                if be.change_profile_picture(current_user.username, pfp, False):
+                    flash("Successfully updated profile picture.",
+                        category="success")
                 else:
-                    flash("Error.", category="error")
+                    flash("Could not update profile picture. Accepted file types: png, jpg, jpeg, gif", category="error")
             else:
                 flash("No file selected.", category="error")
+
+        return profile()
+    
+    @login_required
+    @app.route("/remove-pfp", methods=['GET', 'POST'])
+    def remove_profile_picture():
+        """Summary.
+
+        Returns:
+            The rendered HTML template 'profile.html'.
+
+        """
+        if request.method == 'POST':
+            be.change_profile_picture(current_user.username, None, True)
+            flash("Successfully removed profile picture.",
+                        category="success")
 
         return profile()
 
@@ -339,9 +351,17 @@ def make_endpoints(app):
             The rendered HTML template 'profile.html'.
 
         """
+        new_username = request.form['Username']
         if request.method == 'POST':
-            if be.change_username(current_user.username,
-                                  request.form.get('username')):
+            if not new_username:
+                flash("Please enter a new username.", category="error")
+            elif new_username == current_user.username:
+                flash("New username cannot match current username.", category="error")
+            elif be.change_username(current_user.username,
+                                  new_username):
+                user = User(new_username)
+                # TODO: backend function for next line to work
+                # login_user(user)
                 flash("Successfully updated username!", category="success")
             else:
                 flash("Username is already taken. Please try again.",
