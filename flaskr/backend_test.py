@@ -186,7 +186,8 @@ def test_change_password_fail():
     be.password_bucket = MagicMock()
     be.password_bucket.get_blob.return_value = blob
 
-    assert be.change_password("test_user", "wrong_password", "new_password") == False
+    assert be.change_password("test_user", "wrong_password",
+                              "new_password") == False
 
 
 def test_change_profile_picture_success():
@@ -205,11 +206,12 @@ def test_change_profile_picture_success():
 
     expected = {
         "test_user": {
-            "profile_pic": "test_user-profile-picture-superduperteamawesome.png",
+            "profile_pic":
+                "test_user-profile-picture-superduperteamawesome.png",
             "files_uploaded": []
         }
     }
-    
+
     blob = MagicMock()
     blob.download_as_bytes.decode.return_value = json_test_data
 
@@ -242,7 +244,7 @@ def test_change_profile_picture_fail():
             "files_uploaded": []
         }
     }
-    
+
     blob = MagicMock()
     blob.download_as_bytes.decode.return_value = json_test_data
 
@@ -266,7 +268,7 @@ def test_remove_profile_picture():
             "files_uploaded": []
         }
     }
-    
+
     expected = {
         "test_user": {
             "profile_pic": "default-profile-pic.gif",

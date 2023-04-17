@@ -120,9 +120,7 @@ def make_endpoints(app):
                 if be.sign_up(username, password):
                     user = User(username)
                     login_user(user)
-                    flash(
-                        "Account successfully created!",
-                        category="success")
+                    flash("Account successfully created!", category="success")
                 else:
                     flash(
                         "Username already exists. Please login or choose a different username.",
@@ -250,9 +248,13 @@ def make_endpoints(app):
         files = be.get_user_files(current_user.username)
         num_files = len(files)
 
-        return render_template('profile.html',
-                               file_num=num_files,
-                               files=files, default="https://storage.cloud.google.com/awesomewikicontent/default-profile-pic.gif")
+        return render_template(
+            'profile.html',
+            file_num=num_files,
+            files=files,
+            default=
+            "https://storage.cloud.google.com/awesomewikicontent/default-profile-pic.gif"
+        )
 
     @login_required
     @app.route("/upload-pfp", methods=['GET', 'POST'])
@@ -268,14 +270,16 @@ def make_endpoints(app):
             if pfp:
                 if be.change_profile_picture(current_user.username, pfp, False):
                     flash("Successfully updated profile picture.",
-                        category="success")
+                          category="success")
                 else:
-                    flash("Could not update profile picture. Accepted file types: png, jpg, jpeg, gif", category="error")
+                    flash(
+                        "Could not update profile picture. Accepted file types: png, jpg, jpeg, gif",
+                        category="error")
             else:
                 flash("No file selected.", category="error")
 
         return profile()
-    
+
     @login_required
     @app.route("/remove-pfp", methods=['GET', 'POST'])
     def remove_profile_picture():
@@ -287,8 +291,7 @@ def make_endpoints(app):
         """
         if request.method == 'POST':
             be.change_profile_picture(current_user.username, None, True)
-            flash("Successfully removed profile picture.",
-                        category="success")
+            flash("Successfully removed profile picture.", category="success")
 
         return profile()
 
@@ -356,9 +359,9 @@ def make_endpoints(app):
             if not new_username:
                 flash("Please enter a new username.", category="error")
             elif new_username == current_user.username:
-                flash("New username cannot match current username.", category="error")
-            elif be.change_username(current_user.username,
-                                  new_username):
+                flash("New username cannot match current username.",
+                      category="error")
+            elif be.change_username(current_user.username, new_username):
                 user = User(new_username)
                 # TODO: backend function for next line to work
                 # login_user(user)

@@ -142,18 +142,18 @@ class Backend:
         json_str = json_blob.download_as_bytes().decode()
         json_dict = json.loads(json_str)
         old_pfp = json_dict[username]["profile_pic"]
-        old_blob = self.content_bucket.get_blob(old_pfp)        
+        old_blob = self.content_bucket.get_blob(old_pfp)
 
         if remove:
             old_blob.delete()
             json_dict[username]["profile_pic"] = "default-profile-pic.gif"
-    
+
         else:
             file_type = new_pfp.filename.split(".")[-1]
 
-            if file_type not in ["png","jpeg","jpg","gif"]:
+            if file_type not in ["png", "jpeg", "jpg", "gif"]:
                 return False
-            
+
             if old_pfp != "default-profile-pic.gif" and old_pfp != "default-profile-pic2.gif":
                 old_blob.delete()
 
@@ -163,7 +163,8 @@ class Backend:
             json_dict[username]["profile_pic"] = file_name
 
         mod_json_data = json.dumps(json_dict)
-        json_blob.upload_from_string(mod_json_data, content_type="application/json")
+        json_blob.upload_from_string(mod_json_data,
+                                     content_type="application/json")
         return True
 
     def change_password(self, username, current_password, new_password):
