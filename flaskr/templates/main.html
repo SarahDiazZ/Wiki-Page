@@ -6,6 +6,14 @@
 <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css">
 
+    <style>
+        .profile-pic-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        object-fit: cover;
+        }
+    </style>
 
     <div id='navigation-buttons'>
         <head>
@@ -114,7 +122,7 @@
 
             <a href="/logout">Logout</a>
 
-            <a>|  {{ current_user.username }}   |</a>
+            <a href="/profile">|  {{ current_user.username }}   <img class="profile-pic-icon" src="{{ current_user.get_pfp() }}" alt="Profile Picture">|</a>
         </div>
         {% endif %}
 
@@ -169,21 +177,82 @@
         
         
         {% block content %}
-            <body>
+            <body id="Home">
                 {% if not current_user.is_authenticated %}
-                <p>
-                    <span>Welcome to our awesome Wiki Server, we're glad to have you here!</span>
-                </p>
-            {% else %}
-                <p>
-                    Welcome, <span style = "color:fuchsia"><b>{{ current_user.username }}</b></span>!
-                </p>
-            {% endif %}
+                    <p>
+                        <span>Welcome to our awesome Wiki Server, we're glad to have you here!</span>
+                    </p>
+                {% else %}
+                    <p>
+                        Welcome, <span style = "color:fuchsia"><b>{{ current_user.username }}</b></span>!
+                    </p>
+                {% endif %}
 
-            <div id="your_id">
-                <br><font size= 5><b>The Ultimate Guide to Building a PC</b></font>
+                <div id="your_id">       
+                    <br><font size= 5><b>The Ultimate Guide to Building a PC</b></font>
+                </div>
+            </body>
+            <body id="imageGallery">
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+                <style>
+                .css-item {
+                    background-color: #777;
+                    height: 700px;
+                }
+            
+                .css-img {
+                    height: 80%;
+                    object-fit: contain;
+                }
+                </style>
+                <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+                <div id="computerCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active css-item" data-bs-interval="5000">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/peripherals.jpeg" class="d-block w-100 css-img" alt="slide1">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>First slide label</h5>
+                        <p>Some representative placeholder content for the first slide.</p>
+                    </div>
+                
+                    </div>
+                    <div class="carousel-item css-item" data-bs-interval="5000">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/ceo_of_cs.jpg" class="d-block w-100 css-img" alt="slide2">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Second slide label</h5>
+                        <p>Some representative placeholder content for the first slide.</p>
+                    </div>
+                
+                    </div>
+                    <div class="carousel-item css-item" data-bs-interval="5000">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/kitty.jpg" class="d-block w-100 css-img" alt="slide3">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Third slide label</h5>
+                        <p>Some representative placeholder content for the first slide.</p>
+                    </div>
+                
+                    </div>
+                </div>
+                
+                <button class="carousel-control-prev" type="button" data-bs-target="#computerCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#computerCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+                
+                </div>
+            </body>
+            <div id="contributors">
+                <p>Contributors:</p>
+                {% for contributor in contributors %}
+                    <li>{{ contributor }}</li>
+                {% endfor %}
             </div>
-        </body>
-    {% endblock %}
-</div>
+
+        {% endblock %}
+    </div>
+    
 </html>
