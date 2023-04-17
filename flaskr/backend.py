@@ -133,16 +133,16 @@ class Backend:
         image = f"{self.content_b}/{blob.name}"
         return image
 
-    # def get_profile_pic(self, username):
-    #     """Summary.
+    def get_profile_pic(self, username):
+        """Summary.
 
-    #     Args:
-    #         username:
+        Args:
+            username:
 
-    #     Returns:
-    #         Something
-    #     """
-    #     return "test.png"
+        Returns:
+            Something
+        """
+        return "test.png"
 
     def change_profile_picture(self, username, pfp):
         """Summary.
@@ -223,9 +223,3 @@ class Backend:
         for contributor in json_dict.keys():
             contributors.append(contributor)
         return contributors
-
-    def get_profile_pic(self, username):
-        json_blob = self.content_bucket.get_blob("info.json")
-        json_str = json_blob.download_as_bytes().decode()
-        json_dict = json.loads(json_str)
-        return json_dict[username]["profile_pic"]
