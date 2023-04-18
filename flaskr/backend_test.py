@@ -2,6 +2,7 @@ from flaskr.backend import Backend
 from unittest.mock import MagicMock
 from unittest.mock import patch
 import pytest
+import json
 
 # TODO(Project 1): Write tests for Backend methods.
 
@@ -164,22 +165,25 @@ def test_get_contributors():
         assert be.get_contributors() == expected
 
 def test_get_profile_pic():
+    '''
+    '''
     be = Backend()
 
     json_data = {
         "user1" : {
-            "profile_pic": "https://example.com/profile1.jpg"
+            "profile_pic": "profile1.jpg"
         },
 
         "user2" : {
-            "profile_pic": "https://example.com/profile2.jpg"
+            "profile_pic": "profile2.jpg"
         }
     }
 
     blob1 = MagicMock()
-    blob1.download_as_bytes.return_value.decode.return_value = json.dumps(json_data)
+    blob1.download_as_bytes.decode.return_value = json_data
 
     be.content_bucket = MagicMock()
     be.content_bucket.get_blob.return_value = blob1
-
-    assert be.get_profile_pic("user1") == "https://example.com/profile1.jpg"
+    with patch('json.loads', new_callable=MagicMock) as mock_load:
+        mock_load.return_value = json_data
+        assert be.get_profile_pic("user1") == "profile1.jpg"
