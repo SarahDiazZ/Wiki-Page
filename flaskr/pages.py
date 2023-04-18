@@ -93,7 +93,7 @@ def make_endpoints(app):
         hashed = hashlib.blake2b(with_salt.encode()).hexdigest()
         return hashed
 
-    @app.route("/")
+    @app.route("/", methods=['GET', 'POST'])
     def home():
         """This Flask route function renders the homepage of the website by displaying the 'main.html' template. 
         

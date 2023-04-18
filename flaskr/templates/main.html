@@ -136,25 +136,25 @@
         </form>
 
 
-            <datalist id="list-timezone">
+            <datalist id="list-pcparts">
                 {% for page in pages %}
                 <option value="{{ page }}" data-url="/pages/{{ page }}">{{ page }}</option>                
                 {% endfor %}
             </datalist>
 
             <!-- This only works when we're in the /pages route due to the wiki page list showing up when the user was inside an article -->
-            <datalist id="list-timezone">
+            <datalist id="list-pcparts">
                 {% for page in wiki_pages %}
                 <option value="{{ page }}" data-url="/pages/{{ page }}">{{ page }}</option>                
                 {% endfor %}
             </datalist>
       
-        <div>
+        <div id="autocompleteDropdown">
             <script>
-                $(function() {
+                $(function myAutocompleteFunction() {
                     $('#input-datalist').autocomplete({
                         source: function(request, response) {
-                            const options = $('#list-timezone option');
+                            const options = $('#list-pcparts option');
                             const results = $.map(options, function(option) {
                                 const value = option.value;
                                 if (value.toLowerCase().startsWith(request.term.toLowerCase())) {
