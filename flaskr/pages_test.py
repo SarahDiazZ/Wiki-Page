@@ -7,7 +7,6 @@ from unittest.mock import patch
 from unittest.mock import MagicMock
 # from your_module import myAutocompleteFunction
 
-
 import base64
 import io
 import pytest
@@ -751,6 +750,7 @@ def test_invalid_new_password(client):
                     assert resp.status_code == 200
                     assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
 
+
 def test_autocomplete(client):
     '''Test function to verify the functionality of autocomplete feature.
 
@@ -760,9 +760,9 @@ def test_autocomplete(client):
     search_value = "CPU"
 
     # Use the client.post method to send a request
-    resp = client.post("/", 
-                        data=dict(search_value=search_value),
-                        follow_redirects = True)
+    resp = client.post("/",
+                       data=dict(search_value=search_value),
+                       follow_redirects=True)
 
     # Check that the response status code is 200 (OK)
     assert resp.status_code == 200
@@ -770,5 +770,3 @@ def test_autocomplete(client):
     # Check that the autocomplete dropdown is present in the HTML response
     assert b"<datalist id=\"list-pcparts\">" in resp.data
     assert b'<div id="autocompleteDropdown">' in resp.data
-
-
