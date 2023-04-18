@@ -469,6 +469,11 @@ def test_about(client):
 
 
 def test_about_page_has_search_bar(client):
+    '''Test function to verify that the about page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -480,6 +485,11 @@ def test_about_page_has_search_bar(client):
 
 
 def test_home_page_has_search_bar(client):
+    '''Test function to verify that the homepage has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -491,6 +501,11 @@ def test_home_page_has_search_bar(client):
 
 
 def test_pages_page_has_search_bar(client):
+    '''Test function to verify that the pages page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -503,6 +518,11 @@ def test_pages_page_has_search_bar(client):
 
 
 def test_uploaded_page_has_search_bar(client):
+    '''Test function to verify that uploaded page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -515,6 +535,11 @@ def test_uploaded_page_has_search_bar(client):
 
 
 def test_upload_page_has_search_bar(client):
+    '''Test function to verify that upload page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -524,6 +549,11 @@ def test_upload_page_has_search_bar(client):
 
 
 def test_logout_page_has_search_bar(client):
+    '''Test function to verify that the logout page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -533,6 +563,11 @@ def test_logout_page_has_search_bar(client):
 
 
 def test_login_page_has_search_bar(client):
+    '''Test function to verify that the login page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -542,6 +577,11 @@ def test_login_page_has_search_bar(client):
 
 
 def test_signup_page_has_search_bar(client):
+    '''Test function to verify that the signup page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -712,7 +752,10 @@ def test_invalid_new_password(client):
                     assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
 
 def test_autocomplete(client):
-    '''
+    '''Test function to verify the functionality of autocomplete feature.
+
+    Args:
+        client: A Flask test client instance.
     '''
     search_value = "CPU"
 
