@@ -445,7 +445,8 @@ def test_profile_page(client):
     """
     with patch.object(backend.Backend, 'get_profile_pic') as mock_profile_pic:
         mock_profile_pic.return_value = True
-        with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
             with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
                 mock_sign_in.return_value = True
 
@@ -453,9 +454,9 @@ def test_profile_page(client):
                     mock_get_user.return_value = MockUser('test_user')
 
                     resp = client.post('/login',
-                                    data=dict(Username='test_user',
-                                                Password='test_password1#'),
-                                    follow_redirects=True)
+                                       data=dict(Username='test_user',
+                                                 Password='test_password1#'),
+                                       follow_redirects=True)
                     resp = client.get("/profile")
                     assert resp.status_code == 200
                     assert b"<div id='profile-page'>" in resp.data
@@ -469,7 +470,8 @@ def test_successful_password_change(client):
     """
     with patch.object(backend.Backend, 'get_profile_pic') as mock_profile_pic:
         mock_profile_pic.return_value = True
-        with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
             with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
                 mock_sign_in.return_value = True
 
@@ -477,19 +479,20 @@ def test_successful_password_change(client):
                     mock_get_user.return_value = MockUser('test_user')
 
                     resp = client.post('/login',
-                                    data=dict(Username='test_user',
-                                                Password='test_password1#'),
-                                    follow_redirects=True)
+                                       data=dict(Username='test_user',
+                                                 Password='test_password1#'),
+                                       follow_redirects=True)
 
-                    with patch.object(backend.Backend,
-                                    'change_password') as mock_change_password:
+                    with patch.object(
+                            backend.Backend,
+                            'change_password') as mock_change_password:
                         mock_change_password.return_value = True
 
-                        resp = client.post('/change_password',
-                                        data=dict(
-                                            CurrentPassword='test_password1#',
-                                            NewPassword='test_password2#'),
-                                        follow_redirects=True)
+                        resp = client.post(
+                            '/change_password',
+                            data=dict(CurrentPassword='test_password1#',
+                                      NewPassword='test_password2#'),
+                            follow_redirects=True)
 
                         assert resp.status_code == 200
                         assert b"Successfully updated password!" in resp.data
@@ -504,7 +507,8 @@ def test_same_password(client):
     """
     with patch.object(backend.Backend, 'get_profile_pic') as mock_profile_pic:
         mock_profile_pic.return_value = True
-        with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
             with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
                 mock_sign_in.return_value = True
 
@@ -512,14 +516,15 @@ def test_same_password(client):
                     mock_get_user.return_value = MockUser('test_user')
 
                     resp = client.post('/login',
-                                    data=dict(Username='test_user',
-                                                Password='test_password1#'),
-                                    follow_redirects=True)
+                                       data=dict(Username='test_user',
+                                                 Password='test_password1#'),
+                                       follow_redirects=True)
 
                     resp = client.post('/change_password',
-                                    data=dict(CurrentPassword='test_password1#',
-                                                NewPassword='test_password1#'),
-                                    follow_redirects=True)
+                                       data=dict(
+                                           CurrentPassword='test_password1#',
+                                           NewPassword='test_password1#'),
+                                       follow_redirects=True)
 
                     assert resp.status_code == 200
                     assert b"Passwords cannot match. Please try again." in resp.data
@@ -533,7 +538,8 @@ def test_incorrect_current_password(client):
     """
     with patch.object(backend.Backend, 'get_profile_pic') as mock_profile_pic:
         mock_profile_pic.return_value = True
-        with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
             with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
                 mock_sign_in.return_value = True
 
@@ -541,19 +547,20 @@ def test_incorrect_current_password(client):
                     mock_get_user.return_value = MockUser('test_user')
 
                     resp = client.post('/login',
-                                    data=dict(Username='test_user',
-                                                Password='test_password1#'),
-                                    follow_redirects=True)
+                                       data=dict(Username='test_user',
+                                                 Password='test_password1#'),
+                                       follow_redirects=True)
 
-                    with patch.object(backend.Backend,
-                                    'change_password') as mock_change_password:
+                    with patch.object(
+                            backend.Backend,
+                            'change_password') as mock_change_password:
                         mock_change_password.return_value = False
 
-                        resp = client.post('/change_password',
-                                        data=dict(
-                                            CurrentPassword='test_password2#',
-                                            NewPassword='test_password3#'),
-                                        follow_redirects=True)
+                        resp = client.post(
+                            '/change_password',
+                            data=dict(CurrentPassword='test_password2#',
+                                      NewPassword='test_password3#'),
+                            follow_redirects=True)
 
                         assert resp.status_code == 200
                         assert b"Incorrect current password. Please try again." in resp.data
@@ -568,7 +575,8 @@ def test_invalid_new_password(client):
     """
     with patch.object(backend.Backend, 'get_profile_pic') as mock_profile_pic:
         mock_profile_pic.return_value = True
-        with patch.object(backend.Backend, 'get_contributors') as get_contributor:
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
             with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
                 mock_sign_in.return_value = True
 
@@ -576,14 +584,15 @@ def test_invalid_new_password(client):
                     mock_get_user.return_value = MockUser('test_user')
 
                     resp = client.post('/login',
-                                    data=dict(Username='test_user',
-                                                Password='test_password1#'),
-                                    follow_redirects=True)
+                                       data=dict(Username='test_user',
+                                                 Password='test_password1#'),
+                                       follow_redirects=True)
 
                     resp = client.post('/change_password',
-                                    data=dict(CurrentPassword='test_password1#',
-                                                NewPassword='test_password'),
-                                    follow_redirects=True)
+                                       data=dict(
+                                           CurrentPassword='test_password1#',
+                                           NewPassword='test_password'),
+                                       follow_redirects=True)
 
                     assert resp.status_code == 200
                     assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data

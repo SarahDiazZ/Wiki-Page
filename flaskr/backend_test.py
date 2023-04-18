@@ -164,17 +164,17 @@ def test_get_contributors():
         mock_load.return_value = json_test_data
         assert be.get_contributors() == expected
 
+
 def test_get_profile_pic():
     '''
     '''
     be = Backend()
 
     json_data = {
-        "user1" : {
+        "user1": {
             "profile_pic": "profile1.jpg"
         },
-
-        "user2" : {
+        "user2": {
             "profile_pic": "profile2.jpg"
         }
     }
