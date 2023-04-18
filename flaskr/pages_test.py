@@ -761,16 +761,18 @@ def test_autocomplete(client):
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
         mock_get_all_page_names.return_value = mock_page_names
-        search_value = "CPU"
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
+            search_value = "CPU"
 
-        # Use the client.post method to send a request
-        resp = client.post("/",
-                           data=dict(search_value=search_value),
-                           follow_redirects=True)
+            # Use the client.post method to send a request
+            resp = client.post("/",
+                               data=dict(search_value=search_value),
+                               follow_redirects=True)
 
-        # Check that the response status code is 200 (OK)
-        assert resp.status_code == 200
+            # Check that the response status code is 200 (OK)
+            assert resp.status_code == 200
 
-        # Check that the autocomplete dropdown is present in the HTML response
-        assert b"<datalist id=\"list-pcparts\">" in resp.data
-        assert b'<div id="autocompleteDropdown">' in resp.data
+            # Check that the autocomplete dropdown is present in the HTML response
+            assert b"<datalist id=\"list-pcparts\">" in resp.data
+            assert b'<div id="autocompleteDropdown">' in resp.data
