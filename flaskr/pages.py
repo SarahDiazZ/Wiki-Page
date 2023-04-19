@@ -188,7 +188,7 @@ def make_endpoints(app):
             file = request.files.get("File")
             file_name = request.form['File name']
             if file:
-                if be.upload(file_name, file):
+                if be.upload(current_user.username, file_name, file):
                     flash("File uploaded successfully.", category="success")
                 else:
                     flash("File name is taken.", category="error")
@@ -248,15 +248,8 @@ def make_endpoints(app):
         """
         files = be.get_user_files(current_user.username)
         num_files = len(files)
-        image_name = be.get_profile_pic(current_user.username)
-        #image_data = be.get_image(image_name)
-        image_data = "test"
 
-        return render_template('profile.html',
-                               base_url="https://storage.cloud.google.com/",
-                               image_data=image_data,
-                               file_num=num_files,
-                               files=files)
+        return render_template('profile.html', file_num=num_files, files=files)
 
     @login_required
     @app.route("/upload-pfp", methods=['GET', 'POST'])
