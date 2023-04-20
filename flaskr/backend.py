@@ -301,32 +301,24 @@ class Backend:
     def get_faq(self):
         '''
         '''
-        faq = [
-            {
-                "text" : "First Question?",
-                "user" : "Ricky",
-                "replies" : [
-                {
-                    "text" : "Yes",
-                    "user" : "Jane Doe"
-                }
-                ]
-            },
-            {
-                "text" : "First Question?",
-                "user" : "Cami",
-                "replies" : [
-                {
-                    "text" : "No, it isn't",
-                    "user" : "Sarah"
-                },
-                {
-                    "text" : "I made the first question",
-                    "user" : "Ricky"
-                }
-                ]
-            }
-        ]
+        faq = [{
+            "text": "First Question?",
+            "user": "Ricky",
+            "replies": [{
+                "text": "Yes",
+                "user": "Jane Doe"
+            }]
+        }, {
+            "text":
+                "First Question?",
+            "user":
+                "Cami",
+            "replies": [{
+                "text": "No, it isn't",
+                "user": "Sarah"
+            }, {
+                "text": "I made the first question",
+                "user": "Ricky"
+            }]
+        }]
         return faq
-
-
