@@ -4,8 +4,6 @@ from unittest.mock import patch
 import pytest
 import json
 
-# TODO(Project 1): Write tests for Backend methods.
-
 
 def test_get_wiki_page():
     """Tests if the get_wiki_page returns the content that is inside of the file."""

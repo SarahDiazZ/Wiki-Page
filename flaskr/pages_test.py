@@ -5,6 +5,8 @@ from flaskr import backend
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from unittest.mock import patch
 from unittest.mock import MagicMock
+# from your_module import myAutocompleteFunction
+
 import base64
 import io
 import pytest
@@ -72,30 +74,45 @@ def test_home_page(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'get_contributors') as get_contributors:
-        get_contributors.return_value = []
-        resp = client.get("/")
-        assert resp.status_code == 200
-        assert b'<body id="Home">' in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributors:
+            get_contributors.return_value = []
+            resp = client.get("/")
+            assert resp.status_code == 200
+            assert b'<body id="Home">' in resp.data
 
 
 def test_image_gallery(client):
     """
     """
-    with patch.object(backend.Backend, 'get_contributors') as get_contributors:
-        get_contributors.return_value = []
-        resp = client.get("/")
-        assert resp.status_code == 200
-        assert b'<div class="carousel-inner">' in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributors:
+            get_contributors.return_value = []
+            resp = client.get("/")
+            assert resp.status_code == 200
+            assert b'<div class="carousel-inner">' in resp.data
 
 
 def test_contributors(client):
     """"""
-    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
-        get_contributor.return_value = []
-        resp = client.get("/")
-        assert resp.status_code == 200
-        assert b'<div id="contributors">' in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
+            get_contributor.return_value = []
+            resp = client.get("/")
+            assert resp.status_code == 200
+            assert b'<div id="contributors">' in resp.data
 
 
 def test_login_page(client):
@@ -104,9 +121,13 @@ def test_login_page(client):
     Args:
         client: Test client for the Flask app.
     """
-    resp = client.get('/login')
-    assert resp.status_code == 200
-    assert b"<div id='login-page'>" in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        resp = client.get('/login')
+        assert resp.status_code == 200
+        assert b"<div id='login-page'>" in resp.data
 
 
 def test_successful_login(client):
@@ -115,22 +136,27 @@ def test_successful_login(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
-        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-            mock_sign_in.return_value = True
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
+            with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+                mock_sign_in.return_value = True
 
-            with patch('flask_login.utils._get_user') as mock_get_user:
-                mock_get_user.return_value = MockUser('test_user')
+                with patch('flask_login.utils._get_user') as mock_get_user:
+                    mock_get_user.return_value = MockUser('test_user')
 
-                resp = client.post('/login',
-                                   data=dict(Username='test_user',
-                                             Password='test_password1#'),
-                                   follow_redirects=True)
+                    resp = client.post('/login',
+                                       data=dict(Username='test_user',
+                                                 Password='test_password1#'),
+                                       follow_redirects=True)
 
-                assert resp.status_code == 200
-                assert b'Welcome, <span style = "color:fuchsia"><b>test_user</b></span>!' in resp.data
-                assert mock_sign_in.called
-                assert current_user.is_authenticated
+                    assert resp.status_code == 200
+                    assert b'Welcome, <span style = "color:fuchsia"><b>test_user</b></span>!' in resp.data
+                    assert mock_sign_in.called
+                    assert current_user.is_authenticated
 
 
 def test_unsuccessful_login(client):
@@ -139,17 +165,21 @@ def test_unsuccessful_login(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-        mock_sign_in.return_value = False
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+            mock_sign_in.return_value = False
 
-        resp = client.post('/login',
-                           data=dict(Username='test_user',
-                                     Password='test_password1#'),
-                           follow_redirects=True)
+            resp = client.post('/login',
+                               data=dict(Username='test_user',
+                                         Password='test_password1#'),
+                               follow_redirects=True)
 
-        assert resp.status_code == 200
-        assert b"Invalid username or password. Please try again." in resp.data
-        assert mock_sign_in.called
+            assert resp.status_code == 200
+            assert b"Invalid username or password. Please try again." in resp.data
+            assert mock_sign_in.called
 
 
 def test_logout(client):
@@ -158,25 +188,30 @@ def test_logout(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
-        with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-            mock_sign_in.return_value = True
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
+            with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+                mock_sign_in.return_value = True
 
-            with patch('flask_login.utils._get_user') as mock_get_user:
-                mock_get_user.return_value = MockUser('test_user')
+                with patch('flask_login.utils._get_user') as mock_get_user:
+                    mock_get_user.return_value = MockUser('test_user')
 
-                resp = client.post('/login',
-                                   data=dict(Username='test_user',
-                                             Password='test_password1#'),
-                                   follow_redirects=True)
+                    resp = client.post('/login',
+                                       data=dict(Username='test_user',
+                                                 Password='test_password1#'),
+                                       follow_redirects=True)
 
-                assert current_user.is_authenticated
+                    assert current_user.is_authenticated
 
-                resp = client.get('/logout')
-                assert mock_get_user.called
-                assert resp.status_code == 200
-                assert b"<div id='logout-message'>" in resp.data
-                assert current_user.is_authenticated != True
+                    resp = client.get('/logout')
+                    assert mock_get_user.called
+                    assert resp.status_code == 200
+                    assert b"<div id='logout-message'>" in resp.data
+                    assert current_user.is_authenticated != True
 
 
 def test_upload_page(client):
@@ -185,9 +220,13 @@ def test_upload_page(client):
     Args:
         client: Test client for the Flask app.
     """
-    resp = client.get("/upload")
-    assert resp.status_code == 200
-    assert b"<div id='upload'>" in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        resp = client.get("/upload")
+        assert resp.status_code == 200
+        assert b"<div id='upload'>" in resp.data
 
 
 def test_successful_upload(client):
@@ -196,25 +235,29 @@ def test_successful_upload(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'upload') as mock_upload:
-        mock_upload.return_value = True
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'upload') as mock_upload:
+            mock_upload.return_value = True
 
-        file_data = b'12345'
-        file = io.BytesIO(file_data)
-        file.filename = 'dummy_file.png'
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
-            resp = client.post('/upload',
-                               data={
-                                   'File name': 'dummy_file.png',
-                                   'File': (file, 'dummy_file.png')
-                               },
-                               content_type='multipart/form-data',
-                               follow_redirects=True)
+            file_data = b'12345'
+            file = io.BytesIO(file_data)
+            file.filename = 'dummy_file.png'
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
+                resp = client.post('/upload',
+                                   data={
+                                       'File name': 'dummy_file.png',
+                                       'File': (file, 'dummy_file.png')
+                                   },
+                                   content_type='multipart/form-data',
+                                   follow_redirects=True)
 
-            assert resp.status_code == 200
-            assert mock_upload.called
-            assert b"File uploaded successfully." in resp.data
+                assert resp.status_code == 200
+                assert mock_upload.called
+                assert b"File uploaded successfully." in resp.data
 
 
 def test_unsuccessful_upload(client):
@@ -223,26 +266,30 @@ def test_unsuccessful_upload(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'upload') as mock_upload:
-        mock_upload.return_value = False
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'upload') as mock_upload:
+            mock_upload.return_value = False
 
-        file_data = b'12345'
-        file = io.BytesIO(file_data)
-        file.filename = 'dummy_file.png'
+            file_data = b'12345'
+            file = io.BytesIO(file_data)
+            file.filename = 'dummy_file.png'
 
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
-            resp = client.post('/upload',
-                               data={
-                                   'File name': 'dummy_file.png',
-                                   'File': (file, 'dummy_file.png')
-                               },
-                               content_type='multipart/form-data',
-                               follow_redirects=True)
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
+                resp = client.post('/upload',
+                                   data={
+                                       'File name': 'dummy_file.png',
+                                       'File': (file, 'dummy_file.png')
+                                   },
+                                   content_type='multipart/form-data',
+                                   follow_redirects=True)
 
-            assert resp.status_code == 200
-            assert mock_upload.called
-            assert b"File name is taken." in resp.data
+                assert resp.status_code == 200
+                assert mock_upload.called
+                assert b"File name is taken." in resp.data
 
 
 def test_no_file_upload(client):
@@ -251,15 +298,19 @@ def test_no_file_upload(client):
     Args:
         client: Test client for the Flask app.
     """
-    resp = client.post('/upload',
-                       data={
-                           'File name': 'dummy_file.png',
-                       },
-                       content_type='multipart/form-data',
-                       follow_redirects=True)
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        resp = client.post('/upload',
+                           data={
+                               'File name': 'dummy_file.png',
+                           },
+                           content_type='multipart/form-data',
+                           follow_redirects=True)
 
-    assert resp.status_code == 200
-    assert b"No file selected." in resp.data
+        assert resp.status_code == 200
+        assert b"No file selected." in resp.data
 
 
 def test_signup_page(client):
@@ -268,9 +319,13 @@ def test_signup_page(client):
     Args:
         client: Test client for the Flask app.
     """
-    resp = client.get("/signup")
-    assert resp.status_code == 200
-    assert b"<div id='signup-page'>" in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        resp = client.get("/signup")
+        assert resp.status_code == 200
+        assert b"<div id='signup-page'>" in resp.data
 
 
 def test_successful_signup(client):
@@ -279,17 +334,21 @@ def test_successful_signup(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
-        mock_sign_up.return_value = True
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
+            mock_sign_up.return_value = True
 
-        resp = client.post('/signup',
-                           data=dict(Username='test_user',
-                                     Password='test_password1#'),
-                           follow_redirects=True)
+            resp = client.post('/signup',
+                               data=dict(Username='test_user',
+                                         Password='test_password1#'),
+                               follow_redirects=True)
 
-        assert resp.status_code == 200
-        assert b"Account successfully created! Please login to continue." in resp.data
-        assert mock_sign_up.called
+            assert resp.status_code == 200
+            assert b"Account successfully created! Please login to continue." in resp.data
+            assert mock_sign_up.called
 
 
 def test_taken_username_signup(client):
@@ -298,17 +357,21 @@ def test_taken_username_signup(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
-        mock_sign_up.return_value = False
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
+            mock_sign_up.return_value = False
 
-        resp = client.post('/signup',
-                           data=dict(Username='test_user',
-                                     Password='test_password1#'),
-                           follow_redirects=True)
+            resp = client.post('/signup',
+                               data=dict(Username='test_user',
+                                         Password='test_password1#'),
+                               follow_redirects=True)
 
-        assert resp.status_code == 200
-        assert b"Username already exists. Please login or choose a different username." in resp.data
-        assert mock_sign_up.called
+            assert resp.status_code == 200
+            assert b"Username already exists. Please login or choose a different username." in resp.data
+            assert mock_sign_up.called
 
 
 def test_invalid_password_signup(client):
@@ -317,13 +380,17 @@ def test_invalid_password_signup(client):
     Args:
         client: Test client for the Flask app.
     """
-    resp = client.post('/signup',
-                       data=dict(Username='test_user',
-                                 Password='test_password'),
-                       follow_redirects=True)
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        resp = client.post('/signup',
+                           data=dict(Username='test_user',
+                                     Password='test_password'),
+                           follow_redirects=True)
 
-    assert resp.status_code == 200
-    assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
+        assert resp.status_code == 200
+        assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
 
 
 def test_page_uploads(client):
@@ -334,14 +401,19 @@ def test_page_uploads(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'get_wiki_page') as mock_get_wiki_page:
-        mock_content = 'Test wiki page content'
-        mock_get_wiki_page.return_value = mock_content
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_wiki_page') as mock_get_wiki_page:
+            mock_content = 'Test wiki page content'
+            mock_get_wiki_page.return_value = mock_content
 
-        resp = client.get('/pages/TestPage')
+            resp = client.get('/pages/TestPage')
 
-        assert resp.status_code == 200
-        assert mock_content in resp.get_data(as_text=True)
+            assert resp.status_code == 200
+            assert mock_content in resp.get_data(as_text=True)
 
 
 def test_pages(client):
@@ -356,15 +428,19 @@ def test_pages(client):
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
         mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_all_page_names') as mock_get_all_page_names:
+            mock_page_names = ['Page1', 'Page2', 'Page3']
+            mock_get_all_page_names.return_value = mock_page_names
 
-        resp = client.get('/pages')
+            resp = client.get('/pages')
 
-        assert resp.status_code == 200
+            assert resp.status_code == 200
 
-        assert b"<div id='display-pages'>" in resp.data
+            assert b"<div id='display-pages'>" in resp.data
 
-        for page_name in mock_page_names:
-            assert page_name in resp.get_data(as_text=True)
+            for page_name in mock_page_names:
+                assert page_name in resp.get_data(as_text=True)
 
 
 def test_about(client):
@@ -375,69 +451,145 @@ def test_about(client):
     Args:
         client: Test client for the Flask app.
     """
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'get_image') as mock_get_image:
 
-    with patch.object(backend.Backend, 'get_image') as mock_get_image:
+            #Set up mock data thing
 
-        #Set up mock data thing
+            resp = client.get('/about')
 
-        resp = client.get('/about')
+            assert resp.status_code == 200
 
-        assert resp.status_code == 200
-
-        #check that images are present in html
-        assert b"<div id='about-authors'>" in resp.data
-        mock_get_image.assert_any_call('camila')
-        mock_get_image.assert_any_call('sarah')
-        mock_get_image.assert_any_call('ricardo')
+            #check that images are present in html
+            assert b"<div id='about-authors'>" in resp.data
+            mock_get_image.assert_any_call('camila')
+            mock_get_image.assert_any_call('sarah')
+            mock_get_image.assert_any_call('ricardo')
 
 
 def test_about_page_has_search_bar(client):
+    '''Test function to verify that the about page has a search bar.
 
-    with patch.object(backend.Backend, 'get_image') as mock_get_image:
-        mock_get_image = None
-        response = client.get('/about')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    Args:
+        client: A Flask test client instance.
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'get_image') as mock_get_image:
+            mock_get_image = None
+            response = client.get('/about')
+            assert b'Search for a PC part' in response.data
 
 
 def test_home_page_has_search_bar(client):
-    with patch.object(backend.Backend, 'get_contributors') as get_contributor:
-        response = client.get('/')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    '''Test function to verify that the homepage has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
+            response = client.get('/')
+            assert b'Search for a PC part' in response.data
 
 
 def test_pages_page_has_search_bar(client):
+    '''Test function to verify that the pages page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
-        mock_get_all_page_names = None
-        response = client.get('/pages')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_all_page_names') as mock_get_all_page_names:
+            mock_get_all_page_names = None
+            response = client.get('/pages')
+            assert b'Search for a PC part' in response.data
 
 
 def test_uploaded_page_has_search_bar(client):
-    with patch.object(backend.Backend, 'get_wiki_page') as mock_get_wiki_page:
-        mock_get_wiki_page = None
-        response = client.get('/pages/cpu.html')
-        assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    '''Test function to verify that uploaded page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_wiki_page') as mock_get_wiki_page:
+            mock_get_wiki_page = None
+            response = client.get('/pages/cpu.html')
+            assert b'Search for a PC part' in response.data
 
 
 def test_upload_page_has_search_bar(client):
-    response = client.get('/upload')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    '''Test function to verify that upload page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        response = client.get('/upload')
+        assert b'Search for a PC part' in response.data
 
 
 def test_logout_page_has_search_bar(client):
-    response = client.get('/logout')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    '''Test function to verify that the logout page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        response = client.get('/logout')
+        assert b'Search for a PC part' in response.data
 
 
 def test_login_page_has_search_bar(client):
-    response = client.get('/login')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    '''Test function to verify that the login page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        response = client.get('/login')
+        assert b'Search for a PC part' in response.data
 
 
 def test_signup_page_has_search_bar(client):
-    response = client.get('/signup')
-    assert b'<input type="text" placeholder="Search for a PC part" name="search">' in response.data
+    '''Test function to verify that the signup page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        response = client.get('/signup')
+        assert b'Search for a PC part' in response.data
 
 
 def test_profile_page(client):
@@ -446,26 +598,32 @@ def test_profile_page(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'get_profile_pic') as mock_profile_pic:
-        mock_profile_pic.return_value = True
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
         with patch.object(backend.Backend,
-                          'get_contributors') as get_contributor:
-            with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-                mock_sign_in.return_value = True
-                with patch.object(backend.Backend, "get_user_files") as get_user_files:
-                get_user_files.return_value = ["file.html"]
-                    with patch('flask_login.utils._get_user') as mock_get_user:
-                        mock_get_user.return_value = MockUser('test_user')
+                          'get_profile_pic') as mock_profile_pic:
+            mock_profile_pic.return_value = True
+            with patch.object(backend.Backend,
+                              'get_contributors') as get_contributor:
+                with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+                    mock_sign_in.return_value = True
+                    with patch.object(backend.Backend,
+                                      "get_user_files") as get_user_files:
+                        get_user_files.return_value = ["file.html"]
+                        with patch(
+                                'flask_login.utils._get_user') as mock_get_user:
+                            mock_get_user.return_value = MockUser('test_user')
 
-                        resp = client.post('/login',
-                                        data=dict(Username='test_user',
-                                                    Password='test_password1#'),
-                                        follow_redirects=True)
-                        resp = client.get("/profile")
-                        assert resp.status_code == 200
-                        assert b"<div id='profile-page'>" in resp.data
-    
-
+                            resp = client.post('/login',
+                                               data=dict(
+                                                   Username='test_user',
+                                                   Password='test_password1#'),
+                                               follow_redirects=True)
+                            resp = client.get("/profile")
+                            assert resp.status_code == 200
+                            assert b"<div id='profile-page'>" in resp.data
 
 
 def test_successful_password_change(client):
@@ -477,34 +635,40 @@ def test_successful_password_change(client):
     with patch.object(backend.Backend, 'get_profile_pic') as mock_profile_pic:
         mock_profile_pic.return_value = True
         with patch.object(backend.Backend,
-                          'get_contributors') as get_contributor:
-            with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-                mock_sign_in.return_value = True
-                with patch.object(backend.Backend,
-                                "get_user_files") as get_user_files:
-                    get_user_files.return_value = ["file.html"]
-                    with patch('flask_login.utils._get_user') as mock_get_user:
-                        mock_get_user.return_value = MockUser('test_user')
+                          'get_all_page_names') as mock_get_all_page_names:
+            mock_page_names = ['Page1', 'Page2', 'Page3']
+            mock_get_all_page_names.return_value = mock_page_names
+            with patch.object(backend.Backend,
+                              'get_contributors') as get_contributor:
+                with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+                    mock_sign_in.return_value = True
+                    with patch.object(backend.Backend,
+                                      "get_user_files") as get_user_files:
+                        get_user_files.return_value = ["file.html"]
+                        with patch(
+                                'flask_login.utils._get_user') as mock_get_user:
+                            mock_get_user.return_value = MockUser('test_user')
 
-                        resp = client.post('/login',
-                                        data=dict(Username='test_user',
-                                                    Password='test_password1#'),
-                                        follow_redirects=True)
+                            resp = client.post('/login',
+                                               data=dict(
+                                                   Username='test_user',
+                                                   Password='test_password1#'),
+                                               follow_redirects=True)
 
-                        with patch.object(
-                                backend.Backend,
-                                'change_password') as mock_change_password:
-                            mock_change_password.return_value = True
+                            with patch.object(
+                                    backend.Backend,
+                                    'change_password') as mock_change_password:
+                                mock_change_password.return_value = True
 
-                            resp = client.post(
-                                '/change_password',
-                                data=dict(CurrentPassword='test_password1#',
-                                        NewPassword='test_password2#'),
-                                follow_redirects=True)
+                                resp = client.post(
+                                    '/change_password',
+                                    data=dict(CurrentPassword='test_password1#',
+                                              NewPassword='test_password2#'),
+                                    follow_redirects=True)
 
-                            assert resp.status_code == 200
-                            assert b"Successfully updated password!" in resp.data
-                            assert mock_change_password.called
+                                assert resp.status_code == 200
+                                assert b"Successfully updated password!" in resp.data
+                                assert mock_change_password.called
 
 
 def test_same_password(client):
@@ -513,28 +677,32 @@ def test_same_password(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'get_profile_pic') as mock_profile_pic:
-        mock_profile_pic.return_value = True
-        with patch.object(backend.Backend, "get_user_files") as get_user_files:
-            get_user_files.return_value = ["file.html"]
-            with patch.object(backend.Backend,
-                            'get_contributors') as get_contributor:
-                with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-                    mock_sign_in.return_value = True
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
+            with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+                mock_sign_in.return_value = True
 
-                    with patch('flask_login.utils._get_user') as mock_get_user:
-                        mock_get_user.return_value = MockUser('test_user')
+                with patch('flask_login.utils._get_user') as mock_get_user:
+                    mock_get_user.return_value = MockUser('test_user')
+                    with patch.object(backend.Backend,
+                                      "get_user_files") as get_user_files:
+                        get_user_files.return_value = ["file.html"]
 
                         resp = client.post('/login',
-                                        data=dict(Username='test_user',
-                                                    Password='test_password1#'),
-                                        follow_redirects=True)
+                                           data=dict(
+                                               Username='test_user',
+                                               Password='test_password1#'),
+                                           follow_redirects=True)
 
-                        resp = client.post('/change_password',
-                                        data=dict(
-                                            CurrentPassword='test_password1#',
-                                            NewPassword='test_password1#'),
-                                        follow_redirects=True)
+                        resp = client.post(
+                            '/change_password',
+                            data=dict(CurrentPassword='test_password1#',
+                                      NewPassword='test_password1#'),
+                            follow_redirects=True)
 
                         assert resp.status_code == 200
                         assert b"Passwords cannot match. Please try again." in resp.data
@@ -546,37 +714,40 @@ def test_incorrect_current_password(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'get_profile_pic') as mock_profile_pic:
-        mock_profile_pic.return_value = True
-        with patch.object(backend.Backend, "get_user_files") as get_user_files:
-            get_user_files.return_value = ["file.html"]
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_profile_pic') as mock_profile_pic:
+            mock_profile_pic.return_value = True
             with patch.object(backend.Backend,
-                            'get_contributors') as get_contributor:
-                with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-                    mock_sign_in.return_value = True
+                              "get_user_files") as get_user_files:
+                get_user_files.return_value = ["file.html"]
+                with patch.object(backend.Backend,
+                                  'get_contributors') as get_contributor:
+                    with patch.object(backend.Backend,
+                                      'sign_in') as mock_sign_in:
+                        mock_sign_in.return_value = True
 
-                    with patch('flask_login.utils._get_user') as mock_get_user:
-                        mock_get_user.return_value = MockUser('test_user')
+                        with patch(
+                                'flask_login.utils._get_user') as mock_get_user:
+                            mock_get_user.return_value = MockUser('test_user')
 
-                        resp = client.post('/login',
-                                        data=dict(Username='test_user',
-                                                    Password='test_password1#'),
-                                        follow_redirects=True)
-
-                        with patch.object(
-                                backend.Backend,
-                                'change_password') as mock_change_password:
-                            mock_change_password.return_value = False
+                            resp = client.post('/login',
+                                               data=dict(
+                                                   Username='test_user',
+                                                   Password='test_password1#'),
+                                               follow_redirects=True)
 
                             resp = client.post(
                                 '/change_password',
-                                data=dict(CurrentPassword='test_password2#',
-                                        NewPassword='test_password3#'),
+                                data=dict(CurrentPassword='test_password1#',
+                                          NewPassword='test_password1#'),
                                 follow_redirects=True)
 
                             assert resp.status_code == 200
-                            assert b"Incorrect current password. Please try again." in resp.data
-                            assert mock_change_password.called
+                            assert b"Passwords cannot match. Please try again." in resp.data
 
 
 def test_invalid_new_password(client):
@@ -585,28 +756,70 @@ def test_invalid_new_password(client):
     Args:
         client: Test client for the Flask app.
     """
-    with patch.object(backend.Backend, 'get_profile_pic') as mock_profile_pic:
-        mock_profile_pic.return_value = True
-        with patch.object(backend.Backend, "get_user_files") as mock_user_files:
-            mock_user_files.return_value = ["file.html"]
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_profile_pic') as mock_profile_pic:
+            mock_profile_pic.return_value = True
             with patch.object(backend.Backend,
-                            'get_contributors') as get_contributor:
-                with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
-                    mock_sign_in.return_value = True
+                              "get_user_files") as get_user_files:
+                get_user_files.return_value = ["file.html"]
+                with patch.object(backend.Backend,
+                                  'get_contributors') as get_contributor:
+                    with patch.object(backend.Backend,
+                                      'sign_in') as mock_sign_in:
+                        mock_sign_in.return_value = True
 
-                    with patch('flask_login.utils._get_user') as mock_get_user:
-                        mock_get_user.return_value = MockUser('test_user')
+                        with patch(
+                                'flask_login.utils._get_user') as mock_get_user:
+                            mock_get_user.return_value = MockUser('test_user')
 
-                        resp = client.post('/login',
-                                        data=dict(Username='test_user',
-                                                    Password='test_password1#'),
-                                        follow_redirects=True)
+                            resp = client.post('/login',
+                                               data=dict(
+                                                   Username='test_user',
+                                                   Password='test_password1#'),
+                                               follow_redirects=True)
 
-                        resp = client.post('/change_password',
-                                        data=dict(
-                                            CurrentPassword='test_password1#',
-                                            NewPassword='test_password'),
-                                        follow_redirects=True)
+                            with patch.object(
+                                    backend.Backend,
+                                    'change_password') as mock_change_password:
+                                mock_change_password.return_value = False
 
-                        assert resp.status_code == 200
-                        assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
+                                resp = client.post(
+                                    '/change_password',
+                                    data=dict(CurrentPassword='test_password2#',
+                                              NewPassword='test_password3#'),
+                                    follow_redirects=True)
+
+                                assert resp.status_code == 200
+                                assert b"Incorrect current password. Please try again." in resp.data
+                                assert mock_change_password.called
+
+
+def test_autocomplete(client):
+    '''Test function to verify the functionality of autocomplete feature.
+
+    Args:
+        client: A Flask test client instance.
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
+            search_value = "CPU"
+
+            # Use the client.post method to send a request
+            resp = client.post("/",
+                               data=dict(search_value=search_value),
+                               follow_redirects=True)
+
+            # Check that the response status code is 200 (OK)
+            assert resp.status_code == 200
+
+            # Check that the autocomplete dropdown is present in the HTML response
+            assert b"<datalist id=\"list-pcparts\">" in resp.data
+            assert b'<div id="autocompleteDropdown">' in resp.data

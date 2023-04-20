@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, flash
 from flaskr import backend
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 import hashlib
+from flask import jsonify
 import string
 
 
@@ -92,14 +93,16 @@ def make_endpoints(app):
         hashed = hashlib.blake2b(with_salt.encode()).hexdigest()
         return hashed
 
-    @app.route("/")
+    @app.route("/", methods=['GET', 'POST'])
     def home():
         """This Flask route function renders the homepage of the website by displaying the 'main.html' template. 
         
         Returns:
             A rendered HTML template 'main.html' which is the homepage of the website.
         """
-        return render_template("main.html", contributors=be.get_contributors())
+        return render_template("main.html",
+                               pages=be.get_all_page_names(),
+                               contributors=be.get_contributors())
 
     @app.route("/signup", methods=['GET', 'POST'])
     def signup():
@@ -130,7 +133,7 @@ def make_endpoints(app):
                 flash(
                     "Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol.",
                     category="error")
-        return render_template('signup.html')
+        return render_template('signup.html', pages=be.get_all_page_names())
 
     @app.route("/login", methods=['GET', 'POST'])
     def login():
@@ -158,7 +161,7 @@ def make_endpoints(app):
             else:
                 flash("Invalid username or password. Please try again.",
                       category="error")
-        return render_template('login.html')
+        return render_template('login.html', pages=be.get_all_page_names())
 
     @app.route("/logout")
     def logout():
@@ -168,7 +171,7 @@ def make_endpoints(app):
             The 'logout.html' template
         """
         logout_user()
-        return render_template('logout.html')
+        return render_template('logout.html', pages=be.get_all_page_names())
 
     @login_required
     @app.route("/upload", methods=['GET', 'POST'])
@@ -194,7 +197,7 @@ def make_endpoints(app):
                     flash("File name is taken.", category="error")
             else:
                 flash("No file selected.", category="error")
-        return render_template('upload.html')
+        return render_template('upload.html', pages=be.get_all_page_names())
 
     @app.route("/pages")
     def pages():
@@ -206,7 +209,7 @@ def make_endpoints(app):
             The rendered HTML template 'pages.html' that displays a list of all available wiki pages.
 
         """
-        return render_template("pages.html", pages=be.get_all_page_names())
+        return render_template("pages.html", wiki_pages=be.get_all_page_names())
 
     @app.route("/pages/<page_title>")
     def page_uploads(page_title):
@@ -219,8 +222,11 @@ def make_endpoints(app):
             The rendered HTML template 'pages.html' with the content of a wiki page        
 
         """
+
         content = be.get_wiki_page(page_title)
-        return render_template("pages.html", page_content=content)
+        return render_template("pages.html",
+                               page_content=content,
+                               pages=be.get_all_page_names())
 
     @app.route("/about")
     def about():
@@ -235,7 +241,8 @@ def make_endpoints(app):
         image_data = [be.get_image(image_name) for image_name in image_names]
         return render_template('about.html',
                                image_datas=image_data,
-                               base_url="https://storage.cloud.google.com/")
+                               base_url="https://storage.cloud.google.com/",
+                               pages=be.get_all_page_names())
 
     @login_required
     @app.route("/profile", methods=['GET', 'POST'])
@@ -249,7 +256,10 @@ def make_endpoints(app):
         files = be.get_user_files(current_user.username)
         num_files = len(files)
 
-        return render_template('profile.html', file_num=num_files, files=files)
+        return render_template('profile.html',
+                               file_num=num_files,
+                               files=files,
+                               pages=be.get_all_page_names())
 
     @login_required
     @app.route("/upload-pfp", methods=['GET', 'POST'])

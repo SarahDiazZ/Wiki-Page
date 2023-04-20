@@ -2,14 +2,18 @@
 <html>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <!-- <style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css">
+
+    <style>
         .profile-pic-icon {
         width: 25px;
         height: 20px;
         border-radius: 0;
         object-fit: cover;
         }
-    </style> -->
+    </style>
 
     <div id='navigation-buttons'>
         <head>
@@ -27,6 +31,7 @@
                         overflow: hidden;
                         background-color: #e9e9e9;
                         height: 8%;
+                        /* position: absolute; */
                     }
 
                     .topnav a {
@@ -108,14 +113,12 @@
 
             <a href="/pages">Pages</a>
 
-            <!-- <span>   |   </span> -->
             <a href="/login">Log In</a>
 
             <a href="/signup">Sign Up</a>
         </div>
         <!-- On the other hand, if the user is authenticated, the code displays a similar set of navigation buttons, but includes additional buttons for uploading content and logging out. -->
         {% else %}
-        <div>
         <div class="topnav">
             <a href="/">Home</a>
 
@@ -132,12 +135,57 @@
         </div>
         {% endif %}
 
-        <form action="/" method="get" class="topnav">
+        <!-- The form action part is what redirects the user to another page when they press on the magnifying button  -->        
+        <form action="/pages" method="get" class="topnav">
             <div class="search-container">
-                <input type="text" placeholder="Search for a PC part" name="search">
+                <input type="text" placeholder="Search for a PC part"  id="input-datalist" autocomplete="off">
                 <button type="submit"><i class="fa fa-search"></i></button>
+               
             </div>
         </form>
+
+
+            <datalist id="list-pcparts">
+                {% for page in pages %}
+                <option value="{{ page }}" data-url="/pages/{{ page }}">{{ page }}</option>                
+                {% endfor %}
+            </datalist>
+
+            <!-- This only works when we're in the /pages route due to the wiki page list showing up when the user was inside an article -->
+            <datalist id="list-pcparts">
+                {% for page in wiki_pages %}
+                <option value="{{ page }}" data-url="/pages/{{ page }}">{{ page }}</option>                
+                {% endfor %}
+            </datalist>
+      
+        <div id="autocompleteDropdown">
+            <script>
+                $(function myAutocompleteFunction() {
+                    $('#input-datalist').autocomplete({
+                        source: function(request, response) {
+                            const options = $('#list-pcparts option');
+                            const results = $.map(options, function(option) {
+                                const value = option.value;
+                                if (value.toLowerCase().startsWith(request.term.toLowerCase())) {
+                                    return {
+                                        label: value,
+                                        value: value,
+                                        url: option.getAttribute('data-url')
+                                    };
+                                }
+                            });
+                            response(results);
+                        },
+                        select: function(event, ui) {
+                            window.location.href = ui.item.url;
+                            return false;
+                        }
+                    });
+                });
+            </script>
+        </div>     
+       
+        
         
         {% block content %}
             <body id="Home">
