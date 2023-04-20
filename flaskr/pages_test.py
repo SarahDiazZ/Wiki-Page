@@ -847,16 +847,21 @@ def test_autocomplete(client):
 def test_search_page(client):
     """
     """
-    resp = client.post(
-        '/search-results',
-        data=dict(SearchInput='p',
-                  MatchingResults='"psu.html,peripherals.html,pc-basics.html"'),
-        follow_redirects=True)
-    assert resp.status_code == 200
-    assert b"<div id='search-results'>" in resp.data
-    assert b"psu.html" in resp.data
-    assert b"peripherals.html" in resp.data
-    assert b"pc-basics.html" in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        resp = client.post(
+            '/search-results',
+            data=dict(
+                SearchInput='p',
+                MatchingResults='"psu.html,peripherals.html,pc-basics.html"'),
+            follow_redirects=True)
+        assert resp.status_code == 200
+        assert b"<div id='search-results'>" in resp.data
+        assert b"psu.html" in resp.data
+        assert b"peripherals.html" in resp.data
+        assert b"pc-basics.html" in resp.data
 
 
 def test_successful_upload_profile_picture(client):
