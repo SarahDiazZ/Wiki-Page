@@ -36,24 +36,57 @@ def test_get_all_page_names():
     assert be.get_all_page_names() == [html_file]
 
 
+# Needs to be modified!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 def test_upload_success():
     """Tests if the upload was successful with no conflict."""
     be = Backend()
 
-    file = MagicMock()
-    file.filename.return_value = "testing.html"
-    blob1 = MagicMock()
-    blob1.upload_from_file.return_value = MagicMock()
-    blob1.exists.return_value = False
-    be.content_bucket = MagicMock()
-    be.content_bucket.blob.return_value = blob1
+    json_test_data = {
+        "user": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": ["file.html"]
+        }
+    }
+    json_test_data_str = '{"testing": {"profile_pic": "default-profile-pic.gif", "files_uploaded": ["file.html"]}}'
 
-    assert be.upload("testing", file) == True
+    expected = {
+        "user": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": ["file.html", "testing.html"]
+        }
+    }
+
+    file = MagicMock()
+    file.filename = "test.html"
+
+    blob = MagicMock()
+    blob.exists.return_value = False
+    blob.upload_from_file.return_value = None
+    be.content_bucket = MagicMock()
+    be.content_bucket.blob.return_value = blob
+
+    json_blob = MagicMock()
+    json_blob.download_as_bytes.decode.return_value = json_test_data_str
+    json_blob.upload_from_string.return_value = None
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load, patch(
+            'json.dumps', new_callable=MagicMock) as mock_dump:
+        mock_dump.return_value = json_test_data_str
+        mock_load.return_value = json_test_data
+        assert be.upload("user", "testing", file) == True
+        assert json_test_data == expected
 
 
 def test_upload_fail():
     """Tests if the upload fails when a file with the same name already exists."""
     be = Backend()
+
+    json_test_data = {
+        "user": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": ["file.html"]
+        }
+    }
 
     file = MagicMock()
     file.filename = "testing.html"
@@ -62,19 +95,77 @@ def test_upload_fail():
     be.content_bucket = MagicMock()
     be.content_bucket.blob.return_value = blob1
 
-    assert be.upload("testing", file) == False
+    assert be.upload("user", "testing", file) == False
 
 
 def test_sign_up_success():
     """Tests the sign up was successful and there is no username that is taken."""
     be = Backend()
 
-    blob1 = MagicMock()
-    blob1.exists.return_value = False
-    be.password_bucket = MagicMock()
-    be.password_bucket.blob.return_value = blob1
+    json_test_data = {}
+    json_test_data_str = "{}"
+    expected = {
+        "user": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": []
+        }
+    }
 
-    assert be.sign_up("user", "password") == True
+    blob = MagicMock()
+    blob.exists.return_value = False
+    be.password_bucket = MagicMock()
+    be.password_bucket.blob.return_value = blob
+
+    json_blob = MagicMock()
+    json_blob.download_as_bytes.decode.return_value = json_test_data_str
+    json_blob.upload_from_string.return_value = None
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = json_blob
+
+    with patch('random.randint', new_callable=MagicMock) as mock_randint, patch(
+            'json.loads', new_callable=MagicMock) as mock_load, patch(
+                'json.dumps', new_callable=MagicMock) as mock_dump:
+        mock_randint.return_value = 10
+        mock_dump.return_value = json_test_data_str
+        mock_load.return_value = json_test_data
+
+        assert be.sign_up("user", "password") == True
+        assert json_test_data == expected
+
+
+def test_sign_up_success_easter_egg():
+    """Tests the sign up was successful and there is no username that is taken."""
+    be = Backend()
+
+    json_test_data = {}
+    json_test_data_str = "{}"
+    expected = {
+        "user": {
+            "profile_pic": "default-profile-pic2.gif",
+            "files_uploaded": []
+        }
+    }
+
+    blob = MagicMock()
+    blob.exists.return_value = False
+    be.password_bucket = MagicMock()
+    be.password_bucket.blob.return_value = blob
+
+    json_blob = MagicMock()
+    json_blob.download_as_bytes.decode.return_value = json_test_data_str
+    json_blob.upload_from_string.return_value = None
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = json_blob
+
+    with patch('random.randint', new_callable=MagicMock) as mock_randint, patch(
+            'json.loads', new_callable=MagicMock) as mock_load, patch(
+                'json.dumps', new_callable=MagicMock) as mock_dump:
+        mock_randint.return_value = 2
+        mock_dump.return_value = json_test_data_str
+        mock_load.return_value = json_test_data
+
+        assert be.sign_up("user", "password") == True
+        assert json_test_data == expected
 
 
 def test_sign_up_fail():
@@ -144,6 +235,116 @@ def test_get_image():
     assert be.get_image(img) == f"awesomewikicontent/{img}"
 
 
+def test_successful_change_username():
+    """"""
+    be = Backend()
+    expected = True
+    json_test_data = {
+        "testing": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": ["file.html", "file2.html"]
+        }
+    }
+    json_test_data_str = '{"testing": {"profile_pic": "default-profile-pic.gif", "files_uploaded": ["file.html", "file2.html"]}}'
+
+    blob = MagicMock()
+    blob.exists.return_value = False
+    be.password_bucket = MagicMock()
+    be.password_bucket.blob.return_value = blob
+
+    json_blob = MagicMock()
+    json_blob.download_as_bytes.decode.return_value = json_test_data_str
+    json_blob.upload_from_string.return_value = None
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = json_blob
+
+    old_user_blob = MagicMock()
+    old_user_blob.delete.return_value = None
+    be.password_bucket.get_blob.return_value = old_user_blob
+    be.password_bucket.copy_blob.return_value = None
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load, patch(
+            'json.dumps', new_callable=MagicMock) as mock_dump:
+        mock_dump.return_value = json_test_data_str
+        mock_load.return_value = json_test_data
+        assert be.change_username("testing", "testing1") == expected
+        assert "testing1" in json_test_data
+        assert "testing" not in json_test_data
+
+
+def test_unsuccessful_change_username():
+    """"""
+    be = Backend()
+    expected = False
+    json_test_data = {
+        "testing": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": ["file.html", "file2.html"]
+        },
+        "testing1": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": ["file3.html"]
+        }
+    }
+
+    blob = MagicMock()
+    blob.exists.return_value = True
+    be.password_bucket = MagicMock()
+    be.password_bucket.blob.return_value = blob
+
+    assert be.change_username("testing", "testing1") == expected
+
+
+def test_get_user_files():
+    """"""
+    be = Backend()
+
+    json_test_data = {
+        "testing": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": ["file.html", "file2.html"]
+        }
+    }
+    json_test_data_str = '{"testing": {"profile_pic": "default-profile-pic.gif", "files_uploaded": ["file.html", "file2.html"]}}'
+    expected = ["file.html", "file2.html"]
+
+    json_blob = MagicMock()
+    json_blob.download_as_bytes.decode.return_value = json_test_data_str
+    be.content_bucket = json_blob
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load:
+        mock_load.return_value = json_test_data
+        assert be.get_user_files("testing") == expected
+
+
+def test_delete_uploaded_file():
+    be = Backend()
+
+    json_test_data = {
+        "testing": {
+            "profile_pic": "default-profile-pic.gif",
+            "files_uploaded": ["file.html"]
+        }
+    }
+    json_test_data_str = '{"testing": {"profile_pic": "default-profile-pic.gif", "files_uploaded": ["file.html"]}}'
+    expected = []
+
+    blob = MagicMock()
+    blob.remove.return_value = None
+    be.content_bucket = blob
+
+    json_blob = MagicMock()
+    json_blob.download_as_bytes.decode.return_value = json_test_data_str
+    json_blob.upload_from_string.return_value = MagicMock()
+    be.content_bucket.get_blob.return_value = json_blob
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load, patch(
+            'json.dumps', new_callable=MagicMock) as mock_dump:
+        mock_dump.return_value = json_test_data_str
+        mock_load.return_value = json_test_data
+        assert be.delete_uploaded_file("testing", "file.html") == expected
+
+
 def test_get_contributors():
     """"""
     be = Backend()
@@ -151,11 +352,11 @@ def test_get_contributors():
     json_test_data = {
         "testing": {
             "profile_pic": "default-profile-pic.gif",
-            "files_uploaded": []
+            "files_uploaded": ["file.html"]
         }
     }
     expected = ["testing"]
-    blob1.download_as_bytes.decode.return_value = '{"testing": {"profile_pic": "default-profile-pic.gif", "files_uploaded": []}}'
+    blob1.download_as_bytes.decode.return_value = '{"testing": {"profile_pic": "default-profile-pic.gif", "files_uploaded": ["file.html"]}}'
 
     be.content_bucket = MagicMock()
     be.content_bucket.get_blob.return_value = blob1
