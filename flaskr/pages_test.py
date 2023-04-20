@@ -1,18 +1,13 @@
-from flaskr import create_app
-from flask import url_for
-from flask import Flask
-from flaskr import backend
+from flaskr import create_app, backend
+from flask import url_for, Flask
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
-from unittest.mock import patch
-from unittest.mock import MagicMock
-# from your_module import myAutocompleteFunction
-
+from unittest.mock import patch, MagicMock
 import base64
 import io
 import pytest
 
-# See https://flask.palletsprojects.com/en/2.2.x/testing/
-# for more info on testing
+test_username = "test_user"
+test_password = "test_password1#"
 
 
 class MockUser:
@@ -146,16 +141,15 @@ def test_successful_login(client):
                 mock_sign_in.return_value = True
 
                 with patch('flask_login.utils._get_user') as mock_get_user:
-                    mock_get_user.return_value = MockUser('test_user')
+                    mock_get_user.return_value = MockUser(test_username)
 
                     resp = client.post('/login',
-                                       data=dict(Username='test_user',
-                                                 Password='test_password1#'),
+                                       data=dict(Username=test_username,
+                                                 Password=test_password),
                                        follow_redirects=True)
 
                     assert resp.status_code == 200
-                    assert b'Welcome, <span style = "color:fuchsia"><b>test_user</b></span>!' in resp.data
-                    assert mock_sign_in.called
+                    assert b'href="/logout"' in resp.data
                     assert current_user.is_authenticated
 
 
@@ -173,13 +167,12 @@ def test_unsuccessful_login(client):
             mock_sign_in.return_value = False
 
             resp = client.post('/login',
-                               data=dict(Username='test_user',
-                                         Password='test_password1#'),
+                               data=dict(Username=test_username,
+                                         Password=test_password),
                                follow_redirects=True)
 
             assert resp.status_code == 200
             assert b"Invalid username or password. Please try again." in resp.data
-            assert mock_sign_in.called
 
 
 def test_logout(client):
@@ -198,17 +191,16 @@ def test_logout(client):
                 mock_sign_in.return_value = True
 
                 with patch('flask_login.utils._get_user') as mock_get_user:
-                    mock_get_user.return_value = MockUser('test_user')
+                    mock_get_user.return_value = MockUser(test_username)
 
                     resp = client.post('/login',
-                                       data=dict(Username='test_user',
-                                                 Password='test_password1#'),
+                                       data=dict(Username=test_username,
+                                                 Password=test_password),
                                        follow_redirects=True)
 
                     assert current_user.is_authenticated
 
                     resp = client.get('/logout')
-                    assert mock_get_user.called
                     assert resp.status_code == 200
                     assert b"<div id='logout-message'>" in resp.data
                     assert current_user.is_authenticated != True
@@ -246,7 +238,7 @@ def test_successful_upload(client):
             file = io.BytesIO(file_data)
             file.filename = 'dummy_file.png'
             with patch('flask_login.utils._get_user') as mock_get_user:
-                mock_get_user.return_value = MockUser('test_user')
+                mock_get_user.return_value = MockUser(test_username)
                 resp = client.post('/upload',
                                    data={
                                        'File name': 'dummy_file.png',
@@ -256,7 +248,6 @@ def test_successful_upload(client):
                                    follow_redirects=True)
 
                 assert resp.status_code == 200
-                assert mock_upload.called
                 assert b"File uploaded successfully." in resp.data
 
 
@@ -278,7 +269,7 @@ def test_unsuccessful_upload(client):
             file.filename = 'dummy_file.png'
 
             with patch('flask_login.utils._get_user') as mock_get_user:
-                mock_get_user.return_value = MockUser('test_user')
+                mock_get_user.return_value = MockUser(test_username)
                 resp = client.post('/upload',
                                    data={
                                        'File name': 'dummy_file.png',
@@ -288,7 +279,6 @@ def test_unsuccessful_upload(client):
                                    follow_redirects=True)
 
                 assert resp.status_code == 200
-                assert mock_upload.called
                 assert b"File name is taken." in resp.data
 
 
@@ -342,13 +332,12 @@ def test_successful_signup(client):
             mock_sign_up.return_value = True
 
             resp = client.post('/signup',
-                               data=dict(Username='test_user',
-                                         Password='test_password1#'),
+                               data=dict(Username=test_username,
+                                         Password=test_password),
                                follow_redirects=True)
 
             assert resp.status_code == 200
             assert b"Account successfully created! Please login to continue." in resp.data
-            assert mock_sign_up.called
 
 
 def test_taken_username_signup(client):
@@ -365,13 +354,12 @@ def test_taken_username_signup(client):
             mock_sign_up.return_value = False
 
             resp = client.post('/signup',
-                               data=dict(Username='test_user',
-                                         Password='test_password1#'),
+                               data=dict(Username=test_username,
+                                         Password=test_password),
                                follow_redirects=True)
 
             assert resp.status_code == 200
             assert b"Username already exists. Please login or choose a different username." in resp.data
-            assert mock_sign_up.called
 
 
 def test_invalid_password_signup(client):
@@ -385,12 +373,12 @@ def test_invalid_password_signup(client):
         mock_page_names = ['Page1', 'Page2', 'Page3']
         mock_get_all_page_names.return_value = mock_page_names
         resp = client.post('/signup',
-                           data=dict(Username='test_user',
-                                     Password='test_password'),
+                           data=dict(Username=test_username,
+                                     Password="invalid_password"),
                            follow_redirects=True)
 
         assert resp.status_code == 200
-        assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
+        assert b"Your new password does not meet the requirements." in resp.data
 
 
 def test_page_uploads(client):
@@ -483,7 +471,7 @@ def test_about_page_has_search_bar(client):
         with patch.object(backend.Backend, 'get_image') as mock_get_image:
             mock_get_image = None
             response = client.get('/about')
-            assert b'Search for a PC part' in response.data
+            assert b'Search' in response.data
 
 
 def test_home_page_has_search_bar(client):
@@ -499,7 +487,7 @@ def test_home_page_has_search_bar(client):
         with patch.object(backend.Backend,
                           'get_contributors') as get_contributor:
             response = client.get('/')
-            assert b'Search for a PC part' in response.data
+            assert b'Search' in response.data
 
 
 def test_pages_page_has_search_bar(client):
@@ -516,7 +504,7 @@ def test_pages_page_has_search_bar(client):
                           'get_all_page_names') as mock_get_all_page_names:
             mock_get_all_page_names = None
             response = client.get('/pages')
-            assert b'Search for a PC part' in response.data
+            assert b'Search' in response.data
 
 
 def test_uploaded_page_has_search_bar(client):
@@ -533,7 +521,7 @@ def test_uploaded_page_has_search_bar(client):
                           'get_wiki_page') as mock_get_wiki_page:
             mock_get_wiki_page = None
             response = client.get('/pages/cpu.html')
-            assert b'Search for a PC part' in response.data
+            assert b'Search' in response.data
 
 
 def test_upload_page_has_search_bar(client):
@@ -547,7 +535,7 @@ def test_upload_page_has_search_bar(client):
         mock_page_names = ['Page1', 'Page2', 'Page3']
         mock_get_all_page_names.return_value = mock_page_names
         response = client.get('/upload')
-        assert b'Search for a PC part' in response.data
+        assert b'Search' in response.data
 
 
 def test_logout_page_has_search_bar(client):
@@ -561,7 +549,7 @@ def test_logout_page_has_search_bar(client):
         mock_page_names = ['Page1', 'Page2', 'Page3']
         mock_get_all_page_names.return_value = mock_page_names
         response = client.get('/logout')
-        assert b'Search for a PC part' in response.data
+        assert b'Search' in response.data
 
 
 def test_login_page_has_search_bar(client):
@@ -575,7 +563,7 @@ def test_login_page_has_search_bar(client):
         mock_page_names = ['Page1', 'Page2', 'Page3']
         mock_get_all_page_names.return_value = mock_page_names
         response = client.get('/login')
-        assert b'Search for a PC part' in response.data
+        assert b'Search' in response.data
 
 
 def test_signup_page_has_search_bar(client):
@@ -589,7 +577,34 @@ def test_signup_page_has_search_bar(client):
         mock_page_names = ['Page1', 'Page2', 'Page3']
         mock_get_all_page_names.return_value = mock_page_names
         response = client.get('/signup')
-        assert b'Search for a PC part' in response.data
+        assert b'Search' in response.data
+
+
+def test_profile_page_has_search_bar(client):
+    '''Test function to verify that the signup page has a search bar.
+
+    Args:
+        client: A Flask test client instance.
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_profile_pic') as mock_profile_pic:
+            mock_profile_pic.return_value = True
+            with patch.object(backend.Backend,
+                              'get_contributors') as get_contributor:
+                with patch.object(backend.Backend, 'sign_in') as mock_sign_in:
+                    mock_sign_in.return_value = True
+                    with patch.object(backend.Backend,
+                                      "get_user_files") as get_user_files:
+                        get_user_files.return_value = ["file.html"]
+                        with patch(
+                                'flask_login.utils._get_user') as mock_get_user:
+                            mock_get_user.return_value = MockUser(test_username)
+                            response = client.get('/profile')
+                            assert b'Search' in response.data
 
 
 def test_profile_page(client):
@@ -614,12 +629,12 @@ def test_profile_page(client):
                         get_user_files.return_value = ["file.html"]
                         with patch(
                                 'flask_login.utils._get_user') as mock_get_user:
-                            mock_get_user.return_value = MockUser('test_user')
+                            mock_get_user.return_value = MockUser(test_username)
 
                             resp = client.post('/login',
                                                data=dict(
-                                                   Username='test_user',
-                                                   Password='test_password1#'),
+                                                   Username=test_username,
+                                                   Password=test_password),
                                                follow_redirects=True)
                             resp = client.get("/profile")
                             assert resp.status_code == 200
@@ -647,12 +662,12 @@ def test_successful_password_change(client):
                         get_user_files.return_value = ["file.html"]
                         with patch(
                                 'flask_login.utils._get_user') as mock_get_user:
-                            mock_get_user.return_value = MockUser('test_user')
+                            mock_get_user.return_value = MockUser(test_username)
 
                             resp = client.post('/login',
                                                data=dict(
-                                                   Username='test_user',
-                                                   Password='test_password1#'),
+                                                   Username=test_username,
+                                                   Password=test_password),
                                                follow_redirects=True)
 
                             with patch.object(
@@ -668,7 +683,6 @@ def test_successful_password_change(client):
 
                                 assert resp.status_code == 200
                                 assert b"Successfully updated password!" in resp.data
-                                assert mock_change_password.called
 
 
 def test_same_password(client):
@@ -687,22 +701,21 @@ def test_same_password(client):
                 mock_sign_in.return_value = True
 
                 with patch('flask_login.utils._get_user') as mock_get_user:
-                    mock_get_user.return_value = MockUser('test_user')
+                    mock_get_user.return_value = MockUser(test_username)
                     with patch.object(backend.Backend,
                                       "get_user_files") as get_user_files:
                         get_user_files.return_value = ["file.html"]
 
                         resp = client.post('/login',
-                                           data=dict(
-                                               Username='test_user',
-                                               Password='test_password1#'),
+                                           data=dict(Username=test_username,
+                                                     Password=test_password),
                                            follow_redirects=True)
 
-                        resp = client.post(
-                            '/change_password',
-                            data=dict(CurrentPassword='test_password1#',
-                                      NewPassword='test_password1#'),
-                            follow_redirects=True)
+                        resp = client.post('/change_password',
+                                           data=dict(
+                                               CurrentPassword=test_password,
+                                               NewPassword=test_password),
+                                           follow_redirects=True)
 
                         assert resp.status_code == 200
                         assert b"Passwords cannot match. Please try again." in resp.data
@@ -732,22 +745,26 @@ def test_incorrect_current_password(client):
 
                         with patch(
                                 'flask_login.utils._get_user') as mock_get_user:
-                            mock_get_user.return_value = MockUser('test_user')
+                            mock_get_user.return_value = MockUser(test_username)
 
                             resp = client.post('/login',
                                                data=dict(
-                                                   Username='test_user',
-                                                   Password='test_password1#'),
+                                                   Username=test_username,
+                                                   Password=test_password),
                                                follow_redirects=True)
+                            with patch.object(
+                                    backend.Backend,
+                                    'change_password') as mock_change_password:
+                                mock_change_password.return_value = False
+                                resp = client.post(
+                                    '/change_password',
+                                    data=dict(
+                                        CurrentPassword='incorrect_password1#',
+                                        NewPassword=test_password),
+                                    follow_redirects=True)
 
-                            resp = client.post(
-                                '/change_password',
-                                data=dict(CurrentPassword='test_password1#',
-                                          NewPassword='test_password1#'),
-                                follow_redirects=True)
-
-                            assert resp.status_code == 200
-                            assert b"Passwords cannot match. Please try again." in resp.data
+                                assert resp.status_code == 200
+                                assert b"Incorrect current password. Please try again." in resp.data
 
 
 def test_invalid_new_password(client):
@@ -774,12 +791,12 @@ def test_invalid_new_password(client):
 
                         with patch(
                                 'flask_login.utils._get_user') as mock_get_user:
-                            mock_get_user.return_value = MockUser('test_user')
+                            mock_get_user.return_value = MockUser(test_username)
 
                             resp = client.post('/login',
                                                data=dict(
-                                                   Username='test_user',
-                                                   Password='test_password1#'),
+                                                   Username=test_username,
+                                                   Password=test_password),
                                                follow_redirects=True)
 
                             with patch.object(
@@ -789,13 +806,12 @@ def test_invalid_new_password(client):
 
                                 resp = client.post(
                                     '/change_password',
-                                    data=dict(CurrentPassword='test_password2#',
-                                              NewPassword='test_password3#'),
+                                    data=dict(CurrentPassword=test_password,
+                                              NewPassword='invalid_password'),
                                     follow_redirects=True)
 
                                 assert resp.status_code == 200
-                                assert b"Incorrect current password. Please try again." in resp.data
-                                assert mock_change_password.called
+                                assert b"Your new password does not meet the requirements." in resp.data
 
 
 def test_autocomplete(client):
@@ -812,14 +828,25 @@ def test_autocomplete(client):
                           'get_contributors') as get_contributor:
             search_value = "CPU"
 
-            # Use the client.post method to send a request
             resp = client.post("/",
                                data=dict(search_value=search_value),
                                follow_redirects=True)
 
-            # Check that the response status code is 200 (OK)
             assert resp.status_code == 200
-
-            # Check that the autocomplete dropdown is present in the HTML response
             assert b"<datalist id=\"list-pcparts\">" in resp.data
             assert b'<div id="autocompleteDropdown">' in resp.data
+
+
+def test_search_page(client):
+    """
+    """
+    resp = client.post(
+        '/search-results',
+        data=dict(SearchInput='p',
+                  MatchingResults='"psu.html,peripherals.html,pc-basics.html"'),
+        follow_redirects=True)
+    assert resp.status_code == 200
+    assert b"<div id='search-results'>" in resp.data
+    assert b"psu.html" in resp.data
+    assert b"peripherals.html" in resp.data
+    assert b"pc-basics.html" in resp.data

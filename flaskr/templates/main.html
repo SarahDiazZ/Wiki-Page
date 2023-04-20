@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css">
@@ -31,7 +30,6 @@
                         overflow: hidden;
                         background-color: #e9e9e9;
                         height: 8%;
-                        /* position: absolute; */
                     }
 
                     .topnav a {
@@ -135,10 +133,10 @@
         </div>
         {% endif %}
 
-        <!-- The form action part is what redirects the user to another page when they press on the magnifying button  -->        
-        <form action="/pages" method="get" class="topnav">
+        <form action="/search-results" method="POST" class="topnav">
             <div class="search-container">
-                <input type="text" placeholder="Search for a PC part"  id="input-datalist" autocomplete="off">
+                <input type="text" placeholder="Search for a PC part" id="input-datalist" autocomplete="off" name="SearchInput">
+                <input type="hidden" name="MatchingResults" id="matching-results" value="{{results}}"">
                 <button type="submit"><i class="fa fa-search"></i></button>
                
             </div>
@@ -182,10 +180,18 @@
                         }
                     });
                 });
+
+                $('form.topnav').on('submit', function() {
+                    var results = [];
+                    $('datalist#list-pcparts option').each(function() {
+                        if ($(this).val().toLowerCase().indexOf($('#input-datalist').val().toLowerCase()) >= 0) {
+                            results.push($(this).val());
+                        }
+                    });
+                    $('#matching-results').val(results.join(','));
+                });
             </script>
-        </div>     
-       
-        
+        </div>
         
         {% block content %}
             <body id="Home">

@@ -1,0 +1,21 @@
+{% extends "main.html" %}
+
+{% block content %}
+<!-- 
+    Comment.
+ -->
+    <div id='search-results'>       
+        <br><font size= 5><b>Showing Results for "{{ search_value }}":</b></font>
+        
+        {% if not suggestions %}
+        <br>
+        <br>Your search did not yield any results.
+
+        {% else %}
+            {% for suggestion in suggestions %}
+            <li><a href="/{{suggestion}}">{{ suggestion }}</a></li>
+            {% endfor %}
+        {% endif %}
+
+    </div>
+{% endblock %}

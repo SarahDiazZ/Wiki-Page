@@ -1,6 +1,5 @@
 from flaskr.backend import Backend
-from unittest.mock import MagicMock
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import pytest
 import json
 
@@ -34,7 +33,6 @@ def test_get_all_page_names():
     assert be.get_all_page_names() == [html_file]
 
 
-# Needs to be modified!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 def test_upload_success():
     """Tests if the upload was successful with no conflict."""
     be = Backend()

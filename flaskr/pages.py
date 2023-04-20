@@ -1,8 +1,7 @@
-from flask import render_template, request, redirect, flash
+from flask import render_template, request, redirect, flash, jsonify
 from flaskr import backend
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 import hashlib
-from flask import jsonify
 import string
 
 
@@ -342,11 +341,31 @@ def make_endpoints(app):
             The rendered HTML template 'profile.html'.
 
         """
+        new_username = request.form['Username']
         if request.method == 'POST':
-            if be.change_username(current_user.username,
-                                  request.form.get('username')):
+            if not new_username:
+                flash("Please enter a new username.", category="error")
+            elif new_username == current_user.username:
+                flash("New username cannot match current username.",
+                      category="error")
+            elif be.change_username(current_user.username, new_username):
+                user = User(new_username)
+                login_user(user)
                 flash("Successfully updated username!", category="success")
             else:
                 flash("Username is already taken. Please try again.",
                       category="error")
         return profile()
+
+    @app.route('/search-results', methods=['POST'])
+    def search_results():
+        search_input = request.form['SearchInput']
+        matching_results = request.form['MatchingResults']
+        suggested_pages = matching_results.split(',')
+        if suggested_pages[0] == "":
+            suggested_pages = []
+
+        return render_template('search.html',
+                               suggestions=suggested_pages,
+                               search_value=search_input,
+                               pages=be.get_all_page_names())
