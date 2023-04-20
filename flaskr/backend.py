@@ -53,7 +53,7 @@ class Backend:
                 page_names.append(blob.name)
         return page_names
 
-    def upload(self, name, file):
+    def upload(self, username, name, file):
         """Using the file and name given, it will try to create a blob using the file name and store the file inside of the blob
 
         Args:
@@ -69,7 +69,14 @@ class Backend:
         if blob.exists():
             return False
         else:
+            json_blob = self.content_bucket.get_blob("info.json")
+            json_str = json_blob.download_as_bytes().decode()
+            json_dict = json.loads(json_str)
+            json_dict[username]["files_uploaded"].append(f"{name}.{file_type}")
             blob.upload_from_file(file)
+            mod_json_data = json.dumps(json_dict)
+            json_blob.upload_from_string(mod_json_data,
+                                         content_type="application/json")
             return True
 
     def sign_up(self, username, password):
@@ -87,7 +94,18 @@ class Backend:
         if blob.exists():
             return False
         else:
-            blob.upload_from_string(password)
+            blob.upload_from_string(password,
+                                    content_type="application/octet-stream")
+            json_blob = self.content_bucket.get_blob("info.json")
+            json_str = json_blob.download_as_bytes().decode()
+            json_dict = json.loads(json_str)
+            profile = "default-profile-pic.gif"
+            if random.randint(1, 20) == 2:
+                profile = "default-profile-pic2.gif"
+            json_dict[username] = {"profile_pic": profile, "files_uploaded": []}
+            json_data = json.dumps(json_dict)
+            json_blob.upload_from_string(json_data,
+                                         content_type="application/json")
             return True
 
     def sign_in(self, username, password):
@@ -123,26 +141,54 @@ class Backend:
         return image
 
     def get_profile_pic(self, username):
+        '''
+        '''
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        return json_dict[username]["profile_pic"]
+
+    def change_profile_picture(self, username, new_pfp, remove):
         """Summary.
 
         Args:
-            username:
+            username: 
+            new_pfp:
+            remove:
 
         Returns:
-            Something
+            True if
+            False if
         """
-        return "test.png"
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        old_pfp = json_dict[username]["profile_pic"]
+        old_blob = self.content_bucket.get_blob(old_pfp)
 
-    def change_profile_picture(self, username, pfp):
-        """Summary.
+        if remove:
+            old_blob.delete()
+            json_dict[username]["profile_pic"] = "default-profile-pic.gif"
 
-        Args:
-            username:
-            pfp:
+        else:
+            file_type = new_pfp.filename.split(".")[-1]
 
-        Returns:
-            Something
-        """
+            if file_type not in [
+                    "png", "PNG", "jpeg", "JPG", "jpg", "JPEG", "gif", "GIF"
+            ]:
+                return False
+
+            if old_pfp != "default-profile-pic.gif" and old_pfp != "default-profile-pic2.gif":
+                old_blob.delete()
+
+            file_name = f"{username}-profile-picture-superduperteamawesome.{file_type}"
+            blob = self.content_bucket.blob(file_name)
+            blob.upload_from_file(new_pfp)
+            json_dict[username]["profile_pic"] = file_name
+
+        mod_json_data = json.dumps(json_dict)
+        json_blob.upload_from_string(mod_json_data,
+                                     content_type="application/json")
         return True
 
     def change_password(self, username, current_password, new_password):
@@ -177,6 +223,22 @@ class Backend:
             True if.
             False if.
         """
+        new_blob = self.password_bucket.blob(new_username)
+        if new_blob.exists():
+            return False
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        user_info = json_dict.pop(current_username)
+        json_dict[new_username] = user_info
+        mod_json_data = json.dumps(json_dict)
+        json_blob.upload_from_string(mod_json_data,
+                                     content_type="application/json")
+        old_blob = self.password_bucket.get_blob(current_username)
+        self.password_bucket.copy_blob(old_blob,
+                                       self.password_bucket,
+                                       new_name=new_username)
+        old_blob.delete()
         return True
 
     def get_user_files(self, username):
@@ -188,7 +250,10 @@ class Backend:
         Returns:
             Something
         """
-        return ["test1.png", "test2.jpg", "test3.html"]
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        return json_dict[username]["files_uploaded"]
 
     def delete_uploaded_file(self, username, file_name):
         """Summary.
@@ -200,7 +265,16 @@ class Backend:
         Returns:
             Nothing.
         """
-        pass
+        blob = self.content_bucket.get_blob(file_name)
+        blob.delete()
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        json_dict[username]["files_uploaded"].remove(file_name)
+        mod_json_data = json.dumps(json_dict)
+        json_blob.upload_from_string(mod_json_data,
+                                     content_type="application/json")
+        return json_dict[username]["files_uploaded"]
 
     def get_contributors(self):
         """
@@ -210,36 +284,49 @@ class Backend:
         json_dict = json.loads(json_str)
         contributors = []
         for contributor in json_dict.keys():
-            contributors.append(contributor)
+            if len(json_dict[contributor]["files_uploaded"]) > 0:
+                contributors.append(contributor)
         return contributors
 
     def submit_question(self, username, question):
         '''
         '''
-        json_blob = self.content_bucket.get_blob("info.json")
-        json_str = json_blob.download_as_bytes().decode()
-        json_dict = json.loads(json_str)
-        new_question = {"text" : question,
-            "user" : username,
-            "replies" : []}
-        json_dict["FAQ"].append(new_question)
+        pass
 
-    def submit_reply(self, username, reply, question_index):
+    def submit_reply(self, username, reply, question):
         '''
         '''
-        json_blob = self.content_bucket.get_blob("info.json")
-        json_str = json_blob.download_as_bytes().decode()
-        json_dict = json.loads(json_str)
-        new_reply = {"text" : reply,
-            "user" : username}
-        json_dict["FAQ"][question_index]["replies"].append(new_reply)
+        pass
 
     def get_faq(self):
         '''
         '''
-        json_blob = self.content_bucket.get_blob("info.json")
-        json_str = json_blob.download_as_bytes().decode()
-        json_dict = json.loads(json_str)
-        return json_dict["FAQ"]
+        faq = [
+            {
+                "text" : "First Question?",
+                "user" : "Ricky",
+                "replies" : [
+                {
+                    "text" : "Yes",
+                    "user" : "Jane Doe"
+                }
+                ]
+            },
+            {
+                "text" : "First Question?",
+                "user" : "Cami",
+                "replies" : [
+                {
+                    "text" : "No, it isn't",
+                    "user" : "Sarah"
+                },
+                {
+                    "text" : "I made the first question",
+                    "user" : "Ricky"
+                }
+                ]
+            }
+        ]
+        return faq
 
 

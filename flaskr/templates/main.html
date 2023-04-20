@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css">
 
     <style>
         .profile-pic-icon {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
+        width: 25px;
+        height: 20px;
+        border-radius: 0;
         object-fit: cover;
         }
     </style>
@@ -17,7 +20,7 @@
                 <title>Wiki Server</title>
                 <style>
                 *   {box-sizing: border-box;}
-
+                    
                     body {
                         margin: 0;
                         font-family: Arial, Helvetica, sans-serif;
@@ -87,6 +90,15 @@
                             border: 1px solid #ccc;
                         }
                     }
+
+                    .topnav .profile-pic-icon {
+                        width: 30px;
+                        height: 30px;
+                        border-radius: 50px;
+                        object-fit: cover;
+                        margin-top: -15px;
+                        margin-bottom: -9px;
+                    }
                 </style>
             </head>
         </head>
@@ -107,7 +119,6 @@
         </div>
         <!-- On the other hand, if the user is authenticated, the code displays a similar set of navigation buttons, but includes additional buttons for uploading content and logging out. -->
         {% else %}
-        <div>
         <div class="topnav">
             <a href="/">Home</a>
 
@@ -122,16 +133,69 @@
 
             <a href="/FAQ">FAQ</a>
 
-            <a href="/profile">|  {{ current_user.username }}   <img class="profile-pic-icon" src="{{ current_user.get_pfp() }}" alt="Profile Picture">|</a>
+            <a href="/profile">|  {{ current_user.username }}   <img class="profile-pic-icon" src="{{ current_user.get_profile_picture() }}" alt="Profile Picture">|</a>
         </div>
         {% endif %}
 
-        <form action="/" method="get" class="topnav">
+        <form action="/search-results" method="POST" class="topnav">
             <div class="search-container">
-                <input type="text" placeholder="Search for a PC part" name="search">
+                <input type="text" placeholder="Search for a PC part" id="input-datalist" autocomplete="off" name="SearchInput">
+                <input type="hidden" name="MatchingResults" id="matching-results" value="{{results}}"">
                 <button type="submit"><i class="fa fa-search"></i></button>
+               
             </div>
         </form>
+
+
+            <datalist id="list-pcparts">
+                {% for page in pages %}
+                <option value="{{ page }}" data-url="/pages/{{ page }}">{{ page }}</option>                
+                {% endfor %}
+            </datalist>
+
+            <!-- This only works when we're in the /pages route due to the wiki page list showing up when the user was inside an article -->
+            <datalist id="list-pcparts">
+                {% for page in wiki_pages %}
+                <option value="{{ page }}" data-url="/pages/{{ page }}">{{ page }}</option>                
+                {% endfor %}
+            </datalist>
+      
+        <div id="autocompleteDropdown">
+            <script>
+                $(function myAutocompleteFunction() {
+                    $('#input-datalist').autocomplete({
+                        source: function(request, response) {
+                            const options = $('#list-pcparts option');
+                            const results = $.map(options, function(option) {
+                                const value = option.value;
+                                if (value.toLowerCase().startsWith(request.term.toLowerCase())) {
+                                    return {
+                                        label: value,
+                                        value: value,
+                                        url: option.getAttribute('data-url')
+                                    };
+                                }
+                            });
+                            response(results);
+                        },
+                        select: function(event, ui) {
+                            window.location.href = ui.item.url;
+                            return false;
+                        }
+                    });
+                });
+
+                $('form.topnav').on('submit', function() {
+                    var results = [];
+                    $('datalist#list-pcparts option').each(function() {
+                        if ($(this).val().toLowerCase().indexOf($('#input-datalist').val().toLowerCase()) >= 0) {
+                            results.push($(this).val());
+                        }
+                    });
+                    $('#matching-results').val(results.join(','));
+                });
+            </script>
+        </div>
         
         {% block content %}
             <body id="Home">
