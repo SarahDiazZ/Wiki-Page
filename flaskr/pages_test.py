@@ -580,37 +580,13 @@ def test_invalid_new_password(client):
                 assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
 
 
-def test_faq_page(self, client):
-        with patch.object(backend.Backend, 'get_faq') as mock_get_faq:
-            mock_get_faq.return_value = [
-                {
-                    "text": "First Question?",
-                    "user": "Ricky",
-                    "replies": [
-                        {
-                            "text": "Yes",
-                            "user": "Jane Doe"
-                        }
-                    ]
-                },
-                {
-                    "text": "Second Question?",
-                    "user": "Cami",
-                    "replies": [
-                        {
-                            "text": "No, it isn't",
-                            "user": "Sarah"
-                        },
-                        {
-                            "text": "I made the first question",
-                            "user": "Ricky"
-                        }
-                    ]
-                }
-            ]
-            # obj = MockUser()
-            # result = obj.method()
-            # assert resp.status_code == 200
-            self.assertEqual (len(result), 2)
-            self.assertEqual (result[0]["text"], "First Question?")
-            self.assertEqual (result[0]["user"], "Ricky")
+def test_submit_reply(client):
+    '''
+    '''
+    with patch.object(backend.Backend, 'get_faq') as get_faq:
+        with patch.object(backend.Backend, 'submit_reply') as submit_reply:
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
+                resp = client.post('/submit_reply', data={'reply': 'test', 'index': 0})
+                assert resp.status_code == 200
+                assert b"Successfully submitted reply." in resp.data

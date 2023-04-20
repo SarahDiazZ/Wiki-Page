@@ -216,42 +216,30 @@ class Backend:
     def submit_question(self, username, question):
         '''
         '''
-        pass
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        new_question = {"text" : question,
+            "user" : username,
+            "replies" : []}
+        json_dict["FAQ"].append(new_question)
 
-    def submit_reply(self, username, reply, question):
+    def submit_reply(self, username, reply, question_index):
         '''
         '''
-        pass
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        new_reply = {"text" : reply,
+            "user" : username}
+        json_dict["FAQ"][question_index]["replies"].append(new_reply)
 
     def get_faq(self):
         '''
         '''
-        faq = [
-            {
-                "text" : "First Question?",
-                "user" : "Ricky",
-                "replies" : [
-                {
-                    "text" : "Yes",
-                    "user" : "Jane Doe"
-                }
-                ]
-            },
-            {
-                "text" : "First Question?",
-                "user" : "Cami",
-                "replies" : [
-                {
-                    "text" : "No, it isn't",
-                    "user" : "Sarah"
-                },
-                {
-                    "text" : "I made the first question",
-                    "user" : "Ricky"
-                }
-                ]
-            }
-        ]
-        return faq 
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        return json_dict["FAQ"]
 
 
