@@ -2,14 +2,14 @@
 <html>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <style>
+    <!-- <style>
         .profile-pic-icon {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
+        width: 25px;
+        height: 20px;
+        border-radius: 0;
         object-fit: cover;
         }
-    </style>
+    </style> -->
 
     <div id='navigation-buttons'>
         <head>
@@ -17,7 +17,7 @@
                 <title>Wiki Server</title>
                 <style>
                 *   {box-sizing: border-box;}
-
+                    
                     body {
                         margin: 0;
                         font-family: Arial, Helvetica, sans-serif;
@@ -87,6 +87,15 @@
                             border: 1px solid #ccc;
                         }
                     }
+
+                    .topnav .profile-pic-icon {
+                        width: 30px;
+                        height: 30px;
+                        border-radius: 50px;
+                        object-fit: cover;
+                        margin-top: -15px;
+                        margin-bottom: -9px;
+                    }
                 </style>
             </head>
         </head>
@@ -119,7 +128,7 @@
 
             <a href="/logout">Logout</a>
 
-            <a href="/profile">|  {{ current_user.username }}   <img class="profile-pic-icon" src="{{ current_user.get_pfp() }}" alt="Profile Picture">|</a>
+            <a href="/profile"> | {{ current_user.username }}  <img class="profile-pic-icon" src="{{ current_user.get_pfp() }}" alt="Profile Picture">|</a>
         </div>
         {% endif %}
 
