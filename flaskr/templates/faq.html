@@ -1,0 +1,49 @@
+{% extends "main.html" %}
+
+{% block content %}
+<div id='display-faq'>
+    <body>
+        <h1> FAQ </h1>
+      
+    </body>
+</div>
+
+{% for question in questions %}
+    
+    <li>{{ question['text'] }}  - {{ question['user'] }}</li>
+    {% for reply in question["replies"] %}
+    <span style="padding-left: 20px; display:block">
+        <li>{{ reply['text'] }}  - {{ reply['user'] }}</li>
+    </span>
+    {% endfor %}
+    <br>
+    {% if current_user.is_authenticated %}
+    <form id="reply-form" method="POST" action="/submit_reply">
+        <input type="hidden" name="index" value="{{ loop.index }}">
+        <input type="text" placeholder="Reply..." name="reply">
+        <input type="submit" value="Reply">
+    </form>
+    {% endif %}
+    <br>
+    <br>
+{% endfor %}
+<br>
+{% if current_user.is_authenticated %}
+<form form id="FAQ" method="POST" action="/submit_question">
+    <input type="text" placeholder="Ask a question:" name="question">
+    <input type="submit" value="Submit">
+</form></li>
+{% endif %}
+
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li><b>{{ message }}</b></li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endwith %}
+
+{% endblock %}

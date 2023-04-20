@@ -347,3 +347,26 @@ def make_endpoints(app):
                 flash("Username is already taken. Please try again.",
                       category="error")
         return profile()
+
+    @app.route("/FAQ", methods=['GET', 'POST'])
+    def faq_page():
+        questions = be.get_faq()
+        return render_template("faq.html", questions=questions)
+
+    @app.route("/submit_question", methods=['GET', 'POST'])
+    def submit_question():
+        if request.method == 'POST':
+            question = request.form['question']
+            be.submit_question(current_user.username, question)
+            flash("Successfully submitted question.", category="success")
+        return faq_page()
+
+    @app.route("/submit_reply", methods=['GET', 'POST'])
+    def submit_reply():
+        if request.method == 'POST':
+            reply = request.form['reply']
+            question = request.form['index']
+            be.submit_reply(current_user.username, reply, question)
+            flash("Successfully submitted reply.", category="success")
+        return faq_page()
+

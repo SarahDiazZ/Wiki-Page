@@ -212,3 +212,46 @@ class Backend:
         for contributor in json_dict.keys():
             contributors.append(contributor)
         return contributors
+
+    def submit_question(self, username, question):
+        '''
+        '''
+        pass
+
+    def submit_reply(self, username, reply, question):
+        '''
+        '''
+        pass
+
+    def get_faq(self):
+        '''
+        '''
+        faq = [
+            {
+                "text" : "First Question?",
+                "user" : "Ricky",
+                "replies" : [
+                {
+                    "text" : "Yes",
+                    "user" : "Jane Doe"
+                }
+                ]
+            },
+            {
+                "text" : "First Question?",
+                "user" : "Cami",
+                "replies" : [
+                {
+                    "text" : "No, it isn't",
+                    "user" : "Sarah"
+                },
+                {
+                    "text" : "I made the first question",
+                    "user" : "Ricky"
+                }
+                ]
+            }
+        ]
+        return faq 
+
+

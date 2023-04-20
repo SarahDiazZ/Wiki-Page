@@ -4,16 +4,17 @@ from flask import Flask
 from flaskr import backend
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from unittest.mock import patch
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 import base64
 import io
 import pytest
+import unittest
 
 # See https://flask.palletsprojects.com/en/2.2.x/testing/
 # for more info on testing
 
 
-class MockUser:
+class MockUser():
     """A mock user on the wiki.
         
         This class will create a mock user object to mock the function of a user that is logged in.
@@ -577,3 +578,39 @@ def test_invalid_new_password(client):
 
                 assert resp.status_code == 200
                 assert b"Your new password does not meet the requirements. Please make sure that it is 8 or more characters long and has at least 1 letter, 1 number, and 1 special symbol." in resp.data
+
+
+def test_faq_page(self, client):
+        with patch.object(backend.Backend, 'get_faq') as mock_get_faq:
+            mock_get_faq.return_value = [
+                {
+                    "text": "First Question?",
+                    "user": "Ricky",
+                    "replies": [
+                        {
+                            "text": "Yes",
+                            "user": "Jane Doe"
+                        }
+                    ]
+                },
+                {
+                    "text": "Second Question?",
+                    "user": "Cami",
+                    "replies": [
+                        {
+                            "text": "No, it isn't",
+                            "user": "Sarah"
+                        },
+                        {
+                            "text": "I made the first question",
+                            "user": "Ricky"
+                        }
+                    ]
+                }
+            ]
+            # obj = MockUser()
+            # result = obj.method()
+            # assert resp.status_code == 200
+            self.assertEqual (len(result), 2)
+            self.assertEqual (result[0]["text"], "First Question?")
+            self.assertEqual (result[0]["user"], "Ricky")
