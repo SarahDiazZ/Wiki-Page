@@ -47,14 +47,14 @@ def make_endpoints(app):
             """
             return self.username
 
-        def get_pfp(self):
+        def get_profile_picture(self):
             """Summary.
             
             Returns:
                 Something.
             """
-            base_url = "https://storage.cloud.google.com/awesomewikicontent/"
-            return base_url + be.get_profile_pic(self.username)
+            return "https://storage.cloud.google.com/awesomewikicontent/" + be.get_profile_pic(
+                self.username)
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -68,9 +68,9 @@ def make_endpoints(app):
 
     def validate_password(password):
         if len(password) >= 8:
-            specials = ['!', '#', '*', '&', '$', '@', '%', '?']
-            nums = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
-            letters = list(string.ascii_letters)
+            specials = string.punctuation
+            nums = string.digits
+            letters = string.ascii_letters
             has_special = False
             has_num = False
             has_letter = False
@@ -83,8 +83,7 @@ def make_endpoints(app):
                 elif char in letters:
                     has_letter = True
             return has_special and has_num and has_letter
-        else:
-            return False
+        return False
 
     def hash_password(username, password):
         site_secret = "superduperteamawesome"
@@ -121,9 +120,9 @@ def make_endpoints(app):
                 password = hash_password(username, password)
 
                 if be.sign_up(username, password):
-                    flash(
-                        "Account successfully created! Please login to continue.",
-                        category="success")
+                    user = User(username)
+                    login_user(user)
+                    flash("Account successfully created!", category="success")
                 else:
                     flash(
                         "Username already exists. Please login or choose a different username.",
@@ -255,10 +254,14 @@ def make_endpoints(app):
         files = be.get_user_files(current_user.username)
         num_files = len(files)
 
-        return render_template('profile.html',
-                               file_num=num_files,
-                               files=files,
-                               pages=be.get_all_page_names())
+        return render_template(
+            'profile.html',
+            file_num=num_files,
+            files=files,
+            pages=be.get_all_page_names(),
+            default=
+            "https://storage.cloud.google.com/awesomewikicontent/default-profile-pic.gif"
+        )
 
     @login_required
     @app.route("/upload-pfp", methods=['GET', 'POST'])
@@ -272,13 +275,30 @@ def make_endpoints(app):
         if request.method == 'POST':
             pfp = request.files.get("File")
             if pfp:
-                if be.change_profile_picture(current_user.username, pfp):
-                    flash("Successfully updated your profile picture!",
+                if be.change_profile_picture(current_user.username, pfp, False):
+                    flash("Successfully updated profile picture.",
                           category="success")
                 else:
-                    flash("Error.", category="error")
+                    flash(
+                        "Could not update profile picture. Accepted file types: png, jpg, jpeg, gif",
+                        category="error")
             else:
                 flash("No file selected.", category="error")
+
+        return profile()
+
+    @login_required
+    @app.route("/remove-pfp", methods=['GET', 'POST'])
+    def remove_profile_picture():
+        """Summary.
+
+        Returns:
+            The rendered HTML template 'profile.html'.
+
+        """
+        if request.method == 'POST':
+            be.change_profile_picture(current_user.username, None, True)
+            flash("Successfully removed profile picture.", category="success")
 
         return profile()
 

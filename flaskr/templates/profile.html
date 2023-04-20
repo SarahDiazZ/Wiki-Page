@@ -42,6 +42,13 @@
                 color: inherit;
                 text-decoration: none;
             }
+
+            button,
+            form {
+            display: inline-block;
+            margin-right: 10px;
+            }
+
         </style>
         
         <br><font size= 5><b>Your Profile</b></font>
@@ -50,14 +57,21 @@
         <br><font size= 4><b>Account Info</b></font>
         <br>
         <br>
-        <img class="profile-pic" src="{{ current_user.get_pfp() }}"
+        <img class="profile-pic" src="{{ current_user.get_profile_picture() }}" alt="Profile Picture">
         <br>
-        <button><a href="#change-pfp">Change Profile Picture</a></button>
-        <br>
+        <button><a href="#change-pfp">Change</a></button>
+        
+        {% if default != current_user.get_profile_picture() %}
+        <form id="remove-pfp" method="POST" action="/remove-pfp">
+            <input type="submit" value="Remove">
+        </form>
+        {% endif %}
+
         <form id="change-pfp" method="POST" action="/upload-pfp" enctype="multipart/form-data">
             <br><input type="file" name="File">
             <button type="submit">Upload</button>
         </form>
+        <br>
         <br>
         
         <br>Username: {{ current_user.username }}
@@ -78,7 +92,7 @@
             <input type="password" id="current-password" name="CurrentPassword">
 
             <label for="new-password">New Password:</label>
-            <input type="text" id="new-password" name="NewPassword">
+            <input type="password" id="new-password" name="NewPassword">
 
             <input type="submit" value="Update">
         </form>
@@ -88,6 +102,8 @@
         {% if not files %}
             <br>
             <br>You haven't uploaded any files yet!
+            <br>
+            <br>
         {% else %}
             <br>
             {% for file in files %}
@@ -96,6 +112,8 @@
                 <input type="hidden" name="file_name" value="{{ file }}"">
                 <input type="submit" value="Delete">
             </form></li>
+            <br>
+            <br>
             {% endfor %}
         {% endif %}
         
@@ -103,7 +121,7 @@
             {% if messages %}
                 <ul>
                     {% for message in messages %}
-                            <li><b>{{ message }}</b></li>
+                        <li><b>{{ message }}</b></li>
                     {% endfor %}
                 </ul>
             {% endif %}

@@ -41,13 +41,13 @@ class MockUser:
         """
         return self.username
 
-    def get_pfp(self):
+    def get_profile_picture(self):
         """Summary.
             
         Returns:
             Something
         """
-        return ""
+        return "https://storage.cloud.google.com/awesomewikicontent/default-profile-pic.gif"
 
 
 @pytest.fixture
@@ -331,13 +331,17 @@ def test_successful_signup(client):
         with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
             mock_sign_up.return_value = True
 
-            resp = client.post('/signup',
-                               data=dict(Username=test_username,
-                                         Password=test_password),
-                               follow_redirects=True)
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
 
-            assert resp.status_code == 200
-            assert b"Account successfully created! Please login to continue." in resp.data
+                resp = client.post('/signup',
+                                   data=dict(Username=test_username,
+                                             Password=test_password),
+                                   follow_redirects=True)
+
+                assert resp.status_code == 200
+                assert b"Account successfully created!" in resp.data
+                assert current_user.is_authenticated
 
 
 def test_taken_username_signup(client):
@@ -850,3 +854,148 @@ def test_search_page(client):
     assert b"psu.html" in resp.data
     assert b"peripherals.html" in resp.data
     assert b"pc-basics.html" in resp.data
+
+
+def test_successful_upload_profile_picture(client):
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_profile_pic') as mock_profile_pic:
+            mock_profile_pic.return_value = True
+            with patch.object(backend.Backend,
+                              "get_user_files") as get_user_files:
+                get_user_files.return_value = ["file.html"]
+                with patch.object(backend.Backend,
+                                  'get_contributors') as get_contributor:
+                    with patch.object(backend.Backend,
+                                      'sign_in') as mock_sign_in:
+                        mock_sign_in.return_value = True
+                        with patch(
+                                'flask_login.utils._get_user') as mock_get_user:
+                            mock_get_user.return_value = MockUser(test_username)
+                            with patch.object(backend.Backend,
+                                              'change_profile_picture'
+                                             ) as mock_change_profile_picture:
+                                mock_change_profile_picture.return_value = True
+
+                                file_data = b'12345'
+                                file = io.BytesIO(file_data)
+                                file.filename = 'dummy_file.png'
+
+                                resp = client.post(
+                                    '/upload-pfp',
+                                    data={'File': (file, 'dummy_file.png')},
+                                    content_type='multipart/form-data',
+                                    follow_redirects=True)
+
+                                assert resp.status_code == 200
+                                assert b"Successfully updated profile picture." in resp.data
+
+
+def test_unsuccessful_upload_profile_picture(client):
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_profile_pic') as mock_profile_pic:
+            mock_profile_pic.return_value = True
+            with patch.object(backend.Backend,
+                              "get_user_files") as get_user_files:
+                get_user_files.return_value = ["file.html"]
+                with patch.object(backend.Backend,
+                                  'get_contributors') as get_contributor:
+                    with patch.object(backend.Backend,
+                                      'sign_in') as mock_sign_in:
+                        mock_sign_in.return_value = True
+                        with patch(
+                                'flask_login.utils._get_user') as mock_get_user:
+                            mock_get_user.return_value = MockUser(test_username)
+                            with patch.object(backend.Backend,
+                                              'change_profile_picture'
+                                             ) as mock_change_profile_picture:
+                                mock_change_profile_picture.return_value = False
+
+                                file_data = b'12345'
+                                file = io.BytesIO(file_data)
+                                file.filename = 'dummy_file.html'
+
+                                resp = client.post(
+                                    '/upload-pfp',
+                                    data={'File': (file, 'dummy_file.html')},
+                                    content_type='multipart/form-data',
+                                    follow_redirects=True)
+
+                                assert resp.status_code == 200
+                                assert b"Could not update profile picture." in resp.data
+
+
+def test_no_file_upload_profile_picture(client):
+    """
+    """
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_profile_pic') as mock_profile_pic:
+            mock_profile_pic.return_value = True
+            with patch.object(backend.Backend,
+                              "get_user_files") as get_user_files:
+                get_user_files.return_value = ["file.html"]
+                with patch.object(backend.Backend,
+                                  'get_contributors') as get_contributor:
+                    with patch.object(backend.Backend,
+                                      'sign_in') as mock_sign_in:
+                        mock_sign_in.return_value = True
+                        with patch(
+                                'flask_login.utils._get_user') as mock_get_user:
+                            mock_get_user.return_value = MockUser(test_username)
+
+                            resp = client.post(
+                                '/upload-pfp',
+                                data={
+                                    'File name': 'dummy_file.png',
+                                },
+                                content_type='multipart/form-data',
+                                follow_redirects=True)
+
+                            assert resp.status_code == 200
+                            assert b"No file selected." in resp.data
+
+
+def test_remove_profile_picture(client):
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend,
+                          'get_profile_pic') as mock_profile_pic:
+            mock_profile_pic.return_value = True
+            with patch.object(backend.Backend,
+                              "get_user_files") as get_user_files:
+                get_user_files.return_value = ["file.html"]
+                with patch.object(backend.Backend,
+                                  'get_contributors') as get_contributor:
+                    with patch.object(backend.Backend,
+                                      'sign_in') as mock_sign_in:
+                        mock_sign_in.return_value = True
+
+                        with patch(
+                                'flask_login.utils._get_user') as mock_get_user:
+                            mock_get_user.return_value = MockUser(test_username)
+                            with patch.object(backend.Backend,
+                                              'change_profile_picture'
+                                             ) as mock_change_profile_picture:
+                                mock_change_profile_picture.return_value = True
+
+                                file_data = b'12345'
+                                file = io.BytesIO(file_data)
+                                file.filename = 'dummy_file.png'
+
+                                resp = client.post('/remove-pfp')
+
+                                assert resp.status_code == 200
+                                assert b"Successfully removed profile picture." in resp.data

@@ -148,16 +148,47 @@ class Backend:
         json_dict = json.loads(json_str)
         return json_dict[username]["profile_pic"]
 
-    def change_profile_picture(self, username, pfp):
+    def change_profile_picture(self, username, new_pfp, remove):
         """Summary.
 
         Args:
-            username:
-            pfp:
+            username: 
+            new_pfp:
+            remove:
 
         Returns:
-            Something
+            True if
+            False if
         """
+        json_blob = self.content_bucket.get_blob("info.json")
+        json_str = json_blob.download_as_bytes().decode()
+        json_dict = json.loads(json_str)
+        old_pfp = json_dict[username]["profile_pic"]
+        old_blob = self.content_bucket.get_blob(old_pfp)
+
+        if remove:
+            old_blob.delete()
+            json_dict[username]["profile_pic"] = "default-profile-pic.gif"
+
+        else:
+            file_type = new_pfp.filename.split(".")[-1]
+
+            if file_type not in [
+                    "png", "PNG", "jpeg", "JPG", "jpg", "JPEG", "gif", "GIF"
+            ]:
+                return False
+
+            if old_pfp != "default-profile-pic.gif" and old_pfp != "default-profile-pic2.gif":
+                old_blob.delete()
+
+            file_name = f"{username}-profile-picture-superduperteamawesome.{file_type}"
+            blob = self.content_bucket.blob(file_name)
+            blob.upload_from_file(new_pfp)
+            json_dict[username]["profile_pic"] = file_name
+
+        mod_json_data = json.dumps(json_dict)
+        json_blob.upload_from_string(mod_json_data,
+                                     content_type="application/json")
         return True
 
     def change_password(self, username, current_password, new_password):
@@ -245,7 +276,6 @@ class Backend:
                                      content_type="application/json")
         return json_dict[username]["files_uploaded"]
 
-    # Fix contributors, should be only for
     def get_contributors(self):
         """
         """
