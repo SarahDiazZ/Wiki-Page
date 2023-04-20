@@ -382,7 +382,9 @@ def make_endpoints(app):
         '''
         '''
         questions = be.get_faq()
-        return render_template("faq.html", questions=questions, pages=be.get_all_page_names())
+        return render_template("faq.html",
+                               questions=questions,
+                               pages=be.get_all_page_names())
 
     @app.route("/submit_question", methods=['GET', 'POST'])
     def submit_question():

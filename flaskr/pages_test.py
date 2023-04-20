@@ -844,8 +844,6 @@ def test_autocomplete(client):
             assert b'<div id="autocompleteDropdown">' in resp.data
 
 
-
-                
 def test_search_page(client):
     """
     """
@@ -1005,60 +1003,82 @@ def test_remove_profile_picture(client):
                                 assert resp.status_code == 200
                                 assert b"Successfully removed profile picture." in resp.data
 
+
 def test_submit_reply(client):
     '''
     '''
-    with patch.object(backend.Backend, 'get_faq') as get_faq:
-        with patch.object(backend.Backend, 'submit_reply') as submit_reply:
-            with patch('flask_login.utils._get_user') as mock_get_user:
-                mock_get_user.return_value = MockUser('test_user')
-                resp = client.post('/submit_reply', data={'reply': 'test', 'index': 0})
-                assert resp.status_code == 200
-                assert b"Successfully submitted reply." in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'get_faq') as get_faq:
+            with patch.object(backend.Backend, 'submit_reply') as submit_reply:
+                with patch('flask_login.utils._get_user') as mock_get_user:
+                    mock_get_user.return_value = MockUser('test_user')
+                    resp = client.post('/submit_reply',
+                                       data={
+                                           'reply': 'test',
+                                           'index': 0
+                                       })
+                    assert resp.status_code == 200
+                    assert b"Successfully submitted reply." in resp.data
+
 
 def test_submit_question(client):
     '''
     '''
-    with patch.object(backend.Backend, 'get_faq') as get_faq:
-        with patch.object(backend.Backend, 'submit_question') as submit_question:
-            with patch('flask_login.utils._get_user') as mock_get_user:
-                mock_get_user.return_value = MockUser('test_user')
-                resp = client.post('/submit_question', data={'question': 'test'})
-                assert resp.status_code == 200
-                assert b"Successfully submitted question." in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'get_faq') as get_faq:
+            with patch.object(backend.Backend,
+                              'submit_question') as submit_question:
+                with patch('flask_login.utils._get_user') as mock_get_user:
+                    mock_get_user.return_value = MockUser('test_user')
+                    resp = client.post('/submit_question',
+                                       data={'question': 'test'})
+                    assert resp.status_code == 200
+                    assert b"Successfully submitted question." in resp.data
+
 
 def test_faq_page_loggedin(client):
     '''
     '''
-    with patch.object(backend.Backend, 'get_faq') as get_faq:
-        get_faq.return_value = test_faq = [
-            {
-                "text" : "test question?",
-                "user" : test_username,
-                "replies" : []
-            }
-        ]        
-        with patch('flask_login.utils._get_user') as mock_get_user:
-            mock_get_user.return_value = MockUser('test_user')
-            resp = client.post('/FAQ')
-            assert resp.status_code == 200
-            assert b"<div id='reply-form'>" in resp.data
-            assert b"<div id='question-form'>" in resp.data
-            assert b"test question?" in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'get_faq') as get_faq:
+            get_faq.return_value = test_faq = [{
+                "text": "test question?",
+                "user": test_username,
+                "replies": []
+            }]
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
+                resp = client.post('/FAQ')
+                assert resp.status_code == 200
+                assert b"<div id='reply-form'>" in resp.data
+                assert b"<div id='question-form'>" in resp.data
+                assert b"test question?" in resp.data
+
 
 def test_faq_page_loggedout(client):
     '''
     '''
-    with patch.object(backend.Backend, 'get_faq') as get_faq:
-        get_faq.return_value = test_faq = [
-            {
-                "text" : "test question?",
-                "user" : test_username,
-                "replies" : []
-            }
-        ]  
-        resp = client.post('/FAQ')
-        assert resp.status_code == 200
-        assert b"<div id='reply-form'>" not in resp.data
-        assert b"<div id='question-form'>" not in resp.data
-        assert b"test question?" in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'get_faq') as get_faq:
+            get_faq.return_value = test_faq = [{
+                "text": "test question?",
+                "user": test_username,
+                "replies": []
+            }]
+            resp = client.post('/FAQ')
+            assert resp.status_code == 200
+            assert b"<div id='reply-form'>" not in resp.data
+            assert b"<div id='question-form'>" not in resp.data
+            assert b"test question?" in resp.data
