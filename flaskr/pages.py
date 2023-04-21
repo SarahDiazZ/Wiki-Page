@@ -439,8 +439,11 @@ def make_endpoints(app):
         '''
         if request.method == 'POST':
             question = request.form['question']
-            be.submit_question(current_user.username, question)
-            flash("Successfully submitted question.", category="success")
+            if not question:
+                flash("Please enter a question.", category="error")
+            else:
+                be.submit_question(current_user.username, question)
+                flash("Successfully submitted question.", category="success")
         return faq_page()
 
     @app.route("/submit_reply", methods=['GET', 'POST'])
@@ -455,8 +458,11 @@ def make_endpoints(app):
         if request.method == 'POST':
             reply = request.form['reply']
             question = request.form['index']
-            be.submit_reply(current_user.username, reply, question)
-            flash("Successfully submitted reply.", category="success")
+            if not reply:
+                flash("Please enter a reply.", category="error")
+            else:
+                be.submit_reply(current_user.username, reply, question)
+                flash("Successfully submitted reply.", category="success")
         return faq_page()
 
     @app.route('/search-results', methods=['POST'])
