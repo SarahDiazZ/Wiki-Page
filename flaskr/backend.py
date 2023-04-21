@@ -2,8 +2,6 @@ from google.cloud import storage
 import json
 import random
 
-# Create mock backend in file to test.
-
 
 class Backend:
     """Retrieves and modifies data from GCS using two buckets, one for passwords and another for content.
@@ -141,24 +139,32 @@ class Backend:
         return image
 
     def get_profile_pic(self, username):
-        '''
-        '''
+        """Retrieves the profile picture from the JSON file.
+
+        Args:
+            username: the name of the user.
+
+        Returns:
+            A string the has part of the path to the GCS location of the profile picture without the base url.
+        """
         json_blob = self.content_bucket.get_blob("info.json")
         json_str = json_blob.download_as_bytes().decode()
         json_dict = json.loads(json_str)
         return json_dict[username]["profile_pic"]
 
     def change_profile_picture(self, username, new_pfp, remove):
-        """Summary.
+        """Changes the user's profile picture.
+
+        Retrieves the user's current profile picture from the JSON file. If remove is True, then the profile picture will be updated to the default. If remove is False, the new profile picture will replace the old one.
 
         Args:
-            username: 
-            new_pfp:
-            remove:
+            username: the name of the user.
+            new_pfp: the image file for the new profile picture.
+            remove: boolean indicating if user only requested to remove current profile picture.
 
         Returns:
-            True if
-            False if
+            True if profile picture was successfully updated.
+            False if image was not accepted file type.
         """
         json_blob = self.content_bucket.get_blob("info.json")
         json_str = json_blob.download_as_bytes().decode()
@@ -192,12 +198,12 @@ class Backend:
         return True
 
     def change_password(self, username, current_password, new_password):
-        """Summary.
+        """Changes the user's password in the GCS bucket.
 
         Args:
-            username: 
-            current_password:
-            new_password:
+            username: the name of the user.
+            current_password: the current password enterred by the user.
+            new_password: the new desired password.
 
         Returns:
             True if the current password is correct and password is updated.
@@ -298,8 +304,12 @@ class Backend:
         return contributors
 
     def submit_question(self, username, question):
-        '''
-        '''
+        """Adds a new FAQ question to the JSON file.
+
+        Args:
+            username: the name of the user.
+            question: string containing the question submitted by the user.
+        """
         json_blob = self.content_bucket.get_blob("website_info.json")
         json_str = json_blob.download_as_bytes().decode()
         json_dict = json.loads(json_str)
@@ -310,8 +320,13 @@ class Backend:
                                      content_type="application/json")
 
     def submit_reply(self, username, reply, question_index):
-        '''
-        '''
+        """Adds a new FAQ reply to corresponding question in the JSON file.
+
+        Args:
+            username: the name of the user.
+            reply: string containing the reply submitted by the user.
+            question_index = integer representing the question for which the reply is being submitted.
+        """
         json_blob = self.content_bucket.get_blob("website_info.json")
         json_str = json_blob.download_as_bytes().decode()
         json_dict = json.loads(json_str)
@@ -322,8 +337,11 @@ class Backend:
                                      content_type="application/json")
 
     def get_faq(self):
-        '''
-        '''
+        """Retrieves all FAQ questions and replies from GCS.
+
+        Returns:
+            A list containing all the questions and replies.
+        """
         json_blob = self.content_bucket.get_blob("website_info.json")
         json_str = json_blob.download_as_bytes().decode()
         json_dict = json.loads(json_str)

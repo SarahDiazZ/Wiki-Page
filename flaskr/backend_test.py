@@ -191,7 +191,7 @@ def test_sign_in_success():
 
 
 def test_sign_in_fail_does_not_exist():
-    """Tests if the sign in was not possible because the username does not exists."""
+    """Tests if the sign in was not possible because the username does not exist."""
     correct = "password"
     be = Backend()
 
@@ -364,8 +364,7 @@ def test_get_contributors():
 
 
 def test_get_profile_pic():
-    '''
-    '''
+    """Tests getting a user's profile picture from Google Cloud."""
     be = Backend()
 
     json_data = {
@@ -388,8 +387,7 @@ def test_get_profile_pic():
 
 
 def test_change_password_success():
-    """
-    """
+    """Tests if the password change was possible because the current password was correct."""
     be = Backend()
     blob = MagicMock()
     blob.return_value = True
@@ -401,8 +399,7 @@ def test_change_password_success():
 
 
 def test_change_password_fail():
-    """
-    """
+    """Tests if the password change was not possible because the current password was incorrect."""
     be = Backend()
     blob = MagicMock()
     blob.return_value = True
@@ -415,8 +412,8 @@ def test_change_password_fail():
 
 
 def test_change_profile_picture_success():
-    """
-    """
+    """Tests if the profile picture change was possible because the profile picture file type was acceptable."""
+    be = Backend()
     be = Backend()
     new_pfp = MagicMock()
     new_pfp.filename.split.return_value = ["new_pfp", "png"]
@@ -449,8 +446,8 @@ def test_change_profile_picture_success():
 
 
 def test_change_profile_picture_fail():
-    """
-    """
+    """Tests if the profile picture change was not possible because the profile picture file type was not acceptable."""
+    be = Backend()
     be = Backend()
     new_pfp = MagicMock()
     new_pfp.filename.split.return_value = ["new_pfp", "html"]
@@ -482,8 +479,7 @@ def test_change_profile_picture_fail():
 
 
 def test_remove_profile_picture():
-    """
-    """
+    """Tests if the current profile picture was removed and set to default."""
     be = Backend()
 
     json_test_data = {
@@ -513,6 +509,7 @@ def test_remove_profile_picture():
 
 
 def test_get_faq():
+    """Tests getting the FAQ questions and replies from the JSON file."""
     be = Backend()
     blob = MagicMock()
     json_test_data = {
@@ -535,6 +532,7 @@ def test_get_faq():
 
 
 def test_submit_question():
+    """Tests if question was successfully submitted, JSON file was updated correctly."""
     be = Backend()
     blob = MagicMock()
 
@@ -568,6 +566,7 @@ def test_submit_question():
 
 
 def test_submit_reply():
+    """Tests if reply was successfully submitted, JSON file was updated correctly."""
     be = Backend()
     blob = MagicMock()
 
