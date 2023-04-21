@@ -48,10 +48,10 @@ def make_endpoints(app):
             return self.username
 
         def get_profile_picture(self):
-            """Summary.
+            """Retrieves user's profile picture.
             
             Returns:
-                Something.
+                Base url added to location of profile picture from Backend.
             """
             return "https://storage.cloud.google.com/awesomewikicontent/" + be.get_profile_pic(
                 self.username)
@@ -67,6 +67,14 @@ def make_endpoints(app):
         return user
 
     def validate_password(password):
+        """Validates that the password passed to it fulfills all requirements.
+        
+        Ensures that the password is 8 or more characters long and contains at least 1 letter, 1 special character, and 1 number.
+        
+        Returns:
+            True if the password fulfills the requirements.
+            False if the password does not fulfill all requirements.
+        """
         if len(password) >= 8:
             specials = string.punctuation
             nums = string.digits
@@ -86,6 +94,11 @@ def make_endpoints(app):
         return False
 
     def hash_password(username, password):
+        """Hashes the password passed to it.
+        
+        Returns:
+            Hashed password
+        """
         site_secret = "superduperteamawesome"
         with_salt = f"{username}{site_secret}{password}"
         hashed = hashlib.blake2b(with_salt.encode()).hexdigest()
@@ -93,7 +106,7 @@ def make_endpoints(app):
 
     @app.route("/", methods=['GET', 'POST'])
     def home():
-        """This Flask route function renders the homepage of the website by displaying the 'main.html' template. 
+        """This Flask route function renders the homepage of the website by displaying the 'main.html' template.
         
         Returns:
             A rendered HTML template 'main.html' which is the homepage of the website.
@@ -108,10 +121,11 @@ def make_endpoints(app):
 
         If the response is POST, reads the username and password submitted in the form and calls the backend to create the new account if possible.
         If unsuccessful, displays error flash message prompting the user to try a different username. 
-        If successful, displays success flash message prompting the user to login.
+        If successful, logs the user in and redirects to the home page.
 
         Returns:
-            The 'signup.html' template if the response is GET
+            The 'signup.html' template if the response is GET.
+            The 'main.html' template if the account is successfully created.
         """
         if request.method == 'POST':
             username = request.form['Username']
@@ -122,7 +136,9 @@ def make_endpoints(app):
                 if be.sign_up(username, password):
                     user = User(username)
                     login_user(user)
-                    flash("Account successfully created!", category="success")
+                    return render_template("main.html",
+                                           pages=be.get_all_page_names(),
+                                           contributors=be.get_contributors())
                 else:
                     flash(
                         "Username already exists. Please login or choose a different username.",
@@ -245,7 +261,7 @@ def make_endpoints(app):
     @login_required
     @app.route("/profile", methods=['GET', 'POST'])
     def profile():
-        """Summary.
+        """Displays the profile page where user can change username and password, update profile picture, and delete their uploaded files.
 
         Returns:
             The rendered HTML template 'profile.html'.
@@ -266,7 +282,10 @@ def make_endpoints(app):
     @login_required
     @app.route("/upload-pfp", methods=['GET', 'POST'])
     def upload_profile_picture():
-        """Summary.
+        """Allows user to upload a new profile picture.
+
+        If no file is submitted or backend is unable to change profile picture, displays error flash message.
+        If backend successfully changes profile picture, displays success flash message.
 
         Returns:
             The rendered HTML template 'profile.html'.
@@ -290,7 +309,9 @@ def make_endpoints(app):
     @login_required
     @app.route("/remove-pfp", methods=['GET', 'POST'])
     def remove_profile_picture():
-        """Summary.
+        """Allows user to remove their current profile picture and restore default picture.
+
+        Calls Backend and displays flash success message.
 
         Returns:
             The rendered HTML template 'profile.html'.
@@ -305,7 +326,9 @@ def make_endpoints(app):
     @login_required
     @app.route("/delete", methods=['GET', 'POST'])
     def delete_file():
-        """Summary.
+        """Allows user to delete a file they uploaded.
+
+        Calls Backend and displays flash success message.
 
         Returns:
             The rendered HTML template 'profile.html'.
@@ -321,7 +344,13 @@ def make_endpoints(app):
     @login_required
     @app.route("/change_password", methods=['GET', 'POST'])
     def change_password():
-        """Summary.
+        """Allows user to change their password.
+
+        If user leaves one or both fields blank, displays error flash message.
+        If user enters the same password for current and new password, displays error flash message.
+        If password does not fulfill requirements, displays error flash message.
+        If current password is incorrect, displays error flash message.
+        If Backend successfully changes password, displays success flash message.
 
         Returns:
             The rendered HTML template 'profile.html'.
@@ -331,7 +360,10 @@ def make_endpoints(app):
             curr_pass = request.form['CurrentPassword']
             new_pass = request.form['NewPassword']
 
-            if curr_pass == new_pass:
+            if not curr_pass or not new_pass:
+                flash("Please fill in both required fields.", category="error")
+
+            elif curr_pass == new_pass:
                 flash("Passwords cannot match. Please try again.",
                       category="error")
 
@@ -355,7 +387,12 @@ def make_endpoints(app):
     @login_required
     @app.route("/change_username", methods=['GET', 'POST'])
     def change_username():
-        """Summary.
+        """Allows user to change their username.
+
+        If user leaves field blank, displays error flash message.
+        If user enters the same username as their current username, displays error flash message.
+        If username is taken, displays error flash message.
+        If Backend successfully changes username, displays success flash message.
 
         Returns:
             The rendered HTML template 'profile.html'.
@@ -364,7 +401,7 @@ def make_endpoints(app):
         new_username = request.form['Username']
         if request.method == 'POST':
             if not new_username:
-                flash("Please enter a new username.", category="error")
+                flash("Please fill in the required field.", category="error")
             elif new_username == current_user.username:
                 flash("New username cannot match current username.",
                       category="error")
@@ -424,6 +461,14 @@ def make_endpoints(app):
 
     @app.route('/search-results', methods=['POST'])
     def search_results():
+        """Displays all matching search results on search page.
+
+        Obtains list of matching results from search and displays the page links. If there are no matching results, passes empty list to HTML file.
+
+        Returns:
+            The rendered HTML template 'search.html'.     
+        """
+
         search_input = request.form['SearchInput']
         matching_results = request.form['MatchingResults']
         suggested_pages = matching_results.split(',')

@@ -1,9 +1,7 @@
 from flaskr import create_app, backend
 from flask import url_for, Flask
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
-from unittest.mock import patch
-from unittest.mock import MagicMock, Mock
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 import base64
 import io
 import pytest
@@ -32,7 +30,7 @@ class MockUser():
         """Indicates if the user is logged in or not.
         
         Returns:
-            True to indicate that the user is still logged in
+            True to indicate that the user is still logged in.
         """
         return True
 
@@ -40,15 +38,15 @@ class MockUser():
         """Passes user id when called.
             
         Returns:
-            The username of the mock user as their user id
+            The username of the mock user as their user id.
         """
         return self.username
 
     def get_profile_picture(self):
-        """Summary.
+        """Retrieves user's profile picture.
             
         Returns:
-            Something
+            Link for default profile picture.
         """
         return "https://storage.cloud.google.com/awesomewikicontent/default-profile-pic.gif"
 
@@ -329,7 +327,7 @@ def test_signup_page(client):
 
 
 def test_successful_signup(client):
-    """Tests the successful signup path by creating a mock Backend object and asserting that success flash message is displayed.
+    """Tests the successful signup path by creating a mock Backend object and asserting that user is logged in.
 
     Args:
         client: Test client for the Flask app.
@@ -338,20 +336,21 @@ def test_successful_signup(client):
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
         mock_get_all_page_names.return_value = mock_page_names
-        with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
-            mock_sign_up.return_value = True
+        with patch.object(backend.Backend,
+                          'get_contributors') as get_contributor:
+            with patch.object(backend.Backend, 'sign_up') as mock_sign_up:
+                mock_sign_up.return_value = True
+                with patch('flask_login.utils._get_user') as mock_get_user:
+                    mock_get_user.return_value = MockUser('test_user')
 
-            with patch('flask_login.utils._get_user') as mock_get_user:
-                mock_get_user.return_value = MockUser('test_user')
+                    resp = client.post('/signup',
+                                       data=dict(Username=test_username,
+                                                 Password=test_password),
+                                       follow_redirects=True)
 
-                resp = client.post('/signup',
-                                   data=dict(Username=test_username,
-                                             Password=test_password),
-                                   follow_redirects=True)
-
-                assert resp.status_code == 200
-                assert b"Account successfully created!" in resp.data
-                assert current_user.is_authenticated
+                    assert resp.status_code == 200
+                    assert b'href="/logout"' in resp.data
+                    assert current_user.is_authenticated
 
 
 def test_taken_username_signup(client):
@@ -419,7 +418,7 @@ def test_page_uploads(client):
 
 
 def test_pages(client):
-    """ Tests the 'pages' route function. 
+    """Tests the 'pages' route function. 
 
     This function mocks the 'get_all_page_names' method of the Backend class to return a list of mock page names.
     
@@ -595,7 +594,7 @@ def test_signup_page_has_search_bar(client):
 
 
 def test_profile_page_has_search_bar(client):
-    '''Test function to verify that the signup page has a search bar.
+    '''Test function to verify that the profile page has a search bar.
 
     Args:
         client: A Flask test client instance.
@@ -656,7 +655,7 @@ def test_profile_page(client):
 
 
 def test_successful_password_change(client):
-    """Summary.
+    """Tests the successful password change path by creating a mock Backend object and asserting that the success flash message is displayed..
 
     Args:
         client: Test client for the Flask app.
@@ -700,7 +699,7 @@ def test_successful_password_change(client):
 
 
 def test_same_password(client):
-    """Summary.
+    """Tests the unsuccessful change password path (same password) by creating a mock Backend object and asserting that the correct error flash message is displayed.
 
     Args:
         client: Test client for the Flask app.
@@ -736,7 +735,7 @@ def test_same_password(client):
 
 
 def test_incorrect_current_password(client):
-    """Summary.
+    """Tests the unsuccessful change password path (incorrect current password) by creating a mock Backend object and asserting that the correct error flash message is displayed.
 
     Args:
         client: Test client for the Flask app.
@@ -782,7 +781,7 @@ def test_incorrect_current_password(client):
 
 
 def test_invalid_new_password(client):
-    """Summary.
+    """Tests the unsuccessful change password path (invalid new password) by creating a mock Backend object and asserting that the correct error flash message is displayed.
 
     Args:
         client: Test client for the Flask app.
@@ -852,7 +851,10 @@ def test_autocomplete(client):
 
 
 def test_search_page(client):
-    """
+    """Tests the search-results route by asserting that the search page displays matching results.
+
+    Args:
+        client: A Flask test client instance.
     """
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
@@ -872,6 +874,11 @@ def test_search_page(client):
 
 
 def test_successful_upload_profile_picture(client):
+    """Tests the successful upload profile picture path by creating a mock Backend object and asserting that the success flash message is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+    """
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -909,7 +916,12 @@ def test_successful_upload_profile_picture(client):
                                 assert b"Successfully updated profile picture." in resp.data
 
 
-def test_unsuccessful_upload_profile_picture(client):
+def test_incorrect_filetype_upload_profile_picture(client):
+    """Tests the unsuccessful upload profile picture path (incorrect file type) by creating a mock Backend object and asserting that the correct error flash message is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+    """
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -948,7 +960,10 @@ def test_unsuccessful_upload_profile_picture(client):
 
 
 def test_no_file_upload_profile_picture(client):
-    """
+    """Tests the unsuccessful upload profile picture path (no file) by creating a mock Backend object and asserting that the correct error flash message is displayed.
+
+    Args:
+        client: Test client for the Flask app.
     """
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
@@ -982,6 +997,11 @@ def test_no_file_upload_profile_picture(client):
 
 
 def test_remove_profile_picture(client):
+    """Tests the remove profile picture path by creating a mock Backend object and asserting that the success flash message is displayed.
+
+    Args:
+        client: Test client for the Flask app.
+    """
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -1065,7 +1085,7 @@ def test_submit_question(client):
                     assert b"Successfully submitted question." in resp.data
 
 
-def test_faq_page_loggedin(client):
+def test_faq_page_logged_in(client):
     """Test the FAQ page when a user is logged in.
 
     The function patches the Backend class's get_all_page_names and get_faq methods to provide mock data, then patches
@@ -1095,7 +1115,7 @@ def test_faq_page_loggedin(client):
                 assert b"test question?" in resp.data
 
 
-def test_faq_page_loggedout(client):
+def test_faq_page_logged_out(client):
     '''Tests the behavior of the FAQ page when the user is logged out.
 
     The function mocks the Backend class's `get_all_page_names()` method to return mock page names, and the `get_faq()`
