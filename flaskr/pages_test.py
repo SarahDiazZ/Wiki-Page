@@ -1010,7 +1010,10 @@ def test_remove_profile_picture(client):
 
 
 def test_submit_reply(client):
-    '''
+    '''Test the submission of a reply by sending a POST request to the '/submit_reply' endpoint.
+    
+    Args:
+        client: A Flask client object for making requests to the application.
     '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
@@ -1030,8 +1033,16 @@ def test_submit_reply(client):
 
 
 def test_submit_question(client):
+    '''Test the functionality of the submit_question endpoint when a user is logged in.
+
+    Mocks the get_all_page_names, get_faq, submit_question, and _get_user methods.
+    Sends a POST request to /submit_question with the data {'question': 'test'}.
+    Asserts that the response has a status code of 200 and contains the success message.
+
+    Args:
+        client: A Flask client for making requests to the application.
     '''
-    '''
+    
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -1048,8 +1059,16 @@ def test_submit_question(client):
 
 
 def test_faq_page_loggedin(client):
-    '''
-    '''
+    """Test the FAQ page when a user is logged in.
+
+    The function patches the Backend class's get_all_page_names and get_faq methods to provide mock data, then patches
+    the _get_user utility function from Flask-Login to simulate a logged-in user. The function then sends a GET request
+    to the /FAQ route and asserts that the response contains the expected HTML elements for the reply and question forms,
+    as well as the test question in the FAQ data.
+
+    Args:
+        client: A Flask client for making requests to the application.
+    """
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
