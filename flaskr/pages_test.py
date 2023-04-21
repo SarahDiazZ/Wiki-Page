@@ -1042,7 +1042,7 @@ def test_submit_question(client):
     Args:
         client: A Flask client for making requests to the application.
     '''
-    
+
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']
@@ -1114,5 +1114,3 @@ def test_faq_page_loggedout(client):
             assert b"<div id='reply-form'>" not in resp.data
             assert b"<div id='question-form'>" not in resp.data
             assert b"test question?" in resp.data
-
-
