@@ -509,3 +509,90 @@ def test_remove_profile_picture():
         mock_load.return_value = json_test_data
         assert be.change_profile_picture("test_user", None, True) == True
         assert json_test_data == expected
+
+
+def test_get_faq():
+    be = Backend()
+    blob = MagicMock()
+    json_test_data = {
+        "FAQ": [{
+            "text": "test_question",
+            "user": "test_user",
+            "replies": []
+        }]
+    }
+
+    expected = [{"text": "test_question", "user": "test_user", "replies": []}]
+
+    blob.download_as_bytes.decode.return_value = json_test_data
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = blob
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load:
+        mock_load.return_value = json_test_data
+        assert be.get_faq() == expected
+
+
+def test_submit_question():
+    be = Backend()
+    blob = MagicMock()
+
+    json_test_data = {
+        "FAQ": [{
+            "text": "test_question",
+            "user": "test_user",
+            "replies": []
+        }]
+    }
+
+    expected = {
+        "FAQ": [{
+            "text": "test_question",
+            "user": "test_user",
+            "replies": []
+        }, {
+            "text": "test_question_2",
+            "user": "test_user_2",
+            "replies": []
+        }]
+    }
+
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = blob
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load:
+        mock_load.return_value = json_test_data
+        be.submit_question("test_user_2", "test_question_2")
+        assert json_test_data == expected
+
+
+def test_submit_reply():
+    be = Backend()
+    blob = MagicMock()
+
+    json_test_data = {
+        "FAQ": [{
+            "text": "test_question",
+            "user": "test_user",
+            "replies": []
+        }]
+    }
+
+    expected = {
+        "FAQ": [{
+            "text": "test_question",
+            "user": "test_user",
+            "replies": [{
+                "text": "test_reply",
+                "user": "test_user_2"
+            }]
+        }]
+    }
+
+    be.content_bucket = MagicMock()
+    be.content_bucket.get_blob.return_value = blob
+
+    with patch('json.loads', new_callable=MagicMock) as mock_load:
+        mock_load.return_value = json_test_data
+        be.submit_reply("test_user_2", "test_reply", 0)
+        assert json_test_data == expected
