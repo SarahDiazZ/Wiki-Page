@@ -114,6 +114,8 @@
             <a href="/login">Log In</a>
 
             <a href="/signup">Sign Up</a>
+
+            <a href="/FAQ">FAQ</a>
         </div>
         <!-- On the other hand, if the user is authenticated, the code displays a similar set of navigation buttons, but includes additional buttons for uploading content and logging out. -->
         {% else %}
@@ -128,6 +130,8 @@
             <a href="/upload">Upload</a>
 
             <a href="/logout">Logout</a>
+
+            <a href="/FAQ">FAQ</a>
 
             <a href="/profile">|  {{ current_user.username }}   <img class="profile-pic-icon" src="{{ current_user.get_profile_picture() }}" alt="Profile Picture">|</a>
         </div>

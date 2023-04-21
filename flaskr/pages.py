@@ -377,6 +377,36 @@ def make_endpoints(app):
                       category="error")
         return profile()
 
+    @app.route("/FAQ", methods=['GET', 'POST'])
+    def faq_page():
+        '''
+        '''
+        questions = be.get_faq()
+        return render_template("faq.html",
+                               questions=questions,
+                               pages=be.get_all_page_names())
+
+    @app.route("/submit_question", methods=['GET', 'POST'])
+    def submit_question():
+        '''
+        '''
+        if request.method == 'POST':
+            question = request.form['question']
+            be.submit_question(current_user.username, question)
+            flash("Successfully submitted question.", category="success")
+        return faq_page()
+
+    @app.route("/submit_reply", methods=['GET', 'POST'])
+    def submit_reply():
+        '''
+        '''
+        if request.method == 'POST':
+            reply = request.form['reply']
+            question = request.form['index']
+            be.submit_reply(current_user.username, reply, question)
+            flash("Successfully submitted reply.", category="success")
+        return faq_page()
+
     @app.route('/search-results', methods=['POST'])
     def search_results():
         search_input = request.form['SearchInput']

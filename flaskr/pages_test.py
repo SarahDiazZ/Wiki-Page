@@ -1,16 +1,19 @@
 from flaskr import create_app, backend
 from flask import url_for, Flask
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
+from unittest.mock import patch
+from unittest.mock import MagicMock, Mock
 from unittest.mock import patch, MagicMock
 import base64
 import io
 import pytest
+import unittest
 
 test_username = "test_user"
 test_password = "test_password1#"
 
 
-class MockUser:
+class MockUser():
     """A mock user on the wiki.
         
         This class will create a mock user object to mock the function of a user that is logged in.
@@ -844,16 +847,21 @@ def test_autocomplete(client):
 def test_search_page(client):
     """
     """
-    resp = client.post(
-        '/search-results',
-        data=dict(SearchInput='p',
-                  MatchingResults='"psu.html,peripherals.html,pc-basics.html"'),
-        follow_redirects=True)
-    assert resp.status_code == 200
-    assert b"<div id='search-results'>" in resp.data
-    assert b"psu.html" in resp.data
-    assert b"peripherals.html" in resp.data
-    assert b"pc-basics.html" in resp.data
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        resp = client.post(
+            '/search-results',
+            data=dict(
+                SearchInput='p',
+                MatchingResults='"psu.html,peripherals.html,pc-basics.html"'),
+            follow_redirects=True)
+        assert resp.status_code == 200
+        assert b"<div id='search-results'>" in resp.data
+        assert b"psu.html" in resp.data
+        assert b"peripherals.html" in resp.data
+        assert b"pc-basics.html" in resp.data
 
 
 def test_successful_upload_profile_picture(client):
@@ -999,3 +1007,83 @@ def test_remove_profile_picture(client):
 
                                 assert resp.status_code == 200
                                 assert b"Successfully removed profile picture." in resp.data
+
+
+def test_submit_reply(client):
+    '''
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'get_faq') as get_faq:
+            with patch.object(backend.Backend, 'submit_reply') as submit_reply:
+                with patch('flask_login.utils._get_user') as mock_get_user:
+                    mock_get_user.return_value = MockUser('test_user')
+                    resp = client.post('/submit_reply',
+                                       data={
+                                           'reply': 'test',
+                                           'index': 0
+                                       })
+                    assert resp.status_code == 200
+                    assert b"Successfully submitted reply." in resp.data
+
+
+def test_submit_question(client):
+    '''
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'get_faq') as get_faq:
+            with patch.object(backend.Backend,
+                              'submit_question') as submit_question:
+                with patch('flask_login.utils._get_user') as mock_get_user:
+                    mock_get_user.return_value = MockUser('test_user')
+                    resp = client.post('/submit_question',
+                                       data={'question': 'test'})
+                    assert resp.status_code == 200
+                    assert b"Successfully submitted question." in resp.data
+
+
+def test_faq_page_loggedin(client):
+    '''
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'get_faq') as get_faq:
+            get_faq.return_value = test_faq = [{
+                "text": "test question?",
+                "user": test_username,
+                "replies": []
+            }]
+            with patch('flask_login.utils._get_user') as mock_get_user:
+                mock_get_user.return_value = MockUser('test_user')
+                resp = client.post('/FAQ')
+                assert resp.status_code == 200
+                assert b"<div id='reply-form'>" in resp.data
+                assert b"<div id='question-form'>" in resp.data
+                assert b"test question?" in resp.data
+
+
+def test_faq_page_loggedout(client):
+    '''
+    '''
+    with patch.object(backend.Backend,
+                      'get_all_page_names') as mock_get_all_page_names:
+        mock_page_names = ['Page1', 'Page2', 'Page3']
+        mock_get_all_page_names.return_value = mock_page_names
+        with patch.object(backend.Backend, 'get_faq') as get_faq:
+            get_faq.return_value = test_faq = [{
+                "text": "test question?",
+                "user": test_username,
+                "replies": []
+            }]
+            resp = client.post('/FAQ')
+            assert resp.status_code == 200
+            assert b"<div id='reply-form'>" not in resp.data
+            assert b"<div id='question-form'>" not in resp.data
+            assert b"test question?" in resp.data
