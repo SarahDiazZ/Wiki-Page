@@ -81,7 +81,7 @@ def test_home_page(client):
             get_contributors.return_value = []
             resp = client.get("/")
             assert resp.status_code == 200
-            assert b'<body id="Home">' in resp.data
+            assert b'<div id="Home" style="margin-left: 20px; margin-right: 20px">' in resp.data
 
 
 def test_image_gallery(client):
@@ -110,7 +110,7 @@ def test_contributors(client):
             get_contributor.return_value = []
             resp = client.get("/")
             assert resp.status_code == 200
-            assert b'<div id="contributors">' in resp.data
+            assert b'<div id="contributors" style="margin-left: 20px; margin-right: 20px">' in resp.data
 
 
 def test_login_page(client):
@@ -125,7 +125,7 @@ def test_login_page(client):
         mock_get_all_page_names.return_value = mock_page_names
         resp = client.get('/login')
         assert resp.status_code == 200
-        assert b"<div id='login-page'>" in resp.data
+        assert b"<div id='login-page' style='margin-left: 20px; margin-right: 20px'>" in resp.data
 
 
 def test_successful_login(client):
@@ -205,7 +205,7 @@ def test_logout(client):
 
                     resp = client.get('/logout')
                     assert resp.status_code == 200
-                    assert b"<div id='logout-message'>" in resp.data
+                    assert b"<div id='logout-message' style='margin-left: 20px; margin-right: 20px'>" in resp.data
                     assert current_user.is_authenticated != True
 
 
@@ -221,7 +221,7 @@ def test_upload_page(client):
         mock_get_all_page_names.return_value = mock_page_names
         resp = client.get("/upload")
         assert resp.status_code == 200
-        assert b"<div id='upload'>" in resp.data
+        assert b"<div id='upload' style='margin-left: 20px; margin-right: 20px'>" in resp.data
 
 
 def test_successful_upload(client):
@@ -318,7 +318,7 @@ def test_signup_page(client):
         mock_get_all_page_names.return_value = mock_page_names
         resp = client.get("/signup")
         assert resp.status_code == 200
-        assert b"<div id='signup-page'>" in resp.data
+        assert b"<div id='signup-page' style='margin-left: 20px; margin-right: 20px'>" in resp.data
 
 
 def test_successful_signup(client):
@@ -432,7 +432,7 @@ def test_pages(client):
 
             assert resp.status_code == 200
 
-            assert b"<div id='display-pages'>" in resp.data
+            assert b"<div id='display-pages' style='margin-left: 20px; margin-right: 20px'>" in resp.data
 
             for page_name in mock_page_names:
                 assert page_name in resp.get_data(as_text=True)
@@ -459,7 +459,7 @@ def test_about(client):
             assert resp.status_code == 200
 
             #check that images are present in html
-            assert b"<div id='about-authors'>" in resp.data
+            assert b"<div id='about-authors' style='margin-left: 20px; margin-right: 20px'>" in resp.data
             mock_get_image.assert_any_call('camila')
             mock_get_image.assert_any_call('sarah')
             mock_get_image.assert_any_call('ricardo')
@@ -645,7 +645,7 @@ def test_profile_page(client):
                                                follow_redirects=True)
                             resp = client.get("/profile")
                             assert resp.status_code == 200
-                            assert b"<div id='profile-page'>" in resp.data
+                            assert b"<div id='profile-page' style='margin-left: 20px; margin-right: 20px'>" in resp.data
 
 
 def test_successful_password_change(client):
@@ -858,7 +858,7 @@ def test_search_page(client):
                 MatchingResults='"psu.html,peripherals.html,pc-basics.html"'),
             follow_redirects=True)
         assert resp.status_code == 200
-        assert b"<div id='search-results'>" in resp.data
+        assert b"<div id='search-results' style='margin-left: 20px; margin-right: 20px'>" in resp.data
         assert b"psu.html" in resp.data
         assert b"peripherals.html" in resp.data
         assert b"pc-basics.html" in resp.data
@@ -1022,7 +1022,7 @@ def test_submit_reply(client):
                     mock_get_user.return_value = MockUser('test_user')
                     resp = client.post('/submit_reply',
                                        data={
-                                           'reply': 'test',
+                                           'reply': 'testing',
                                            'index': 0
                                        })
                     assert resp.status_code == 200
@@ -1070,7 +1070,15 @@ def test_faq_page_loggedin(client):
 
 
 def test_faq_page_loggedout(client):
-    '''
+    '''Tests the behavior of the FAQ page when the user is logged out.
+
+    The function mocks the Backend class's `get_all_page_names()` method to return mock page names, and the `get_faq()`
+    method to return a test FAQ object. It then sends a POST request to the '/FAQ' endpoint and asserts that the
+    response status code is 200, that the reply-form and question-form are not present in the response data, and that
+    the test question is present in the response data.
+
+    Args:
+        client: A test client for making requests to the Flask application.
     '''
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
@@ -1087,3 +1095,5 @@ def test_faq_page_loggedout(client):
             assert b"<div id='reply-form'>" not in resp.data
             assert b"<div id='question-form'>" not in resp.data
             assert b"test question?" in resp.data
+
+

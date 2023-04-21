@@ -379,7 +379,12 @@ def make_endpoints(app):
 
     @app.route("/FAQ", methods=['GET', 'POST'])
     def faq_page():
-        '''
+        '''Displays the Frequently Asked Question (FAQ) page
+
+        This displays the FAQ page with a list of all questions and their answers.
+
+        Returns:
+            The result of calling the render_template() function, which renders the FAQ page template with the list of questions and all available page names.
         '''
         questions = be.get_faq()
         return render_template("faq.html",
@@ -388,7 +393,12 @@ def make_endpoints(app):
 
     @app.route("/submit_question", methods=['GET', 'POST'])
     def submit_question():
-        '''
+        '''Handles the submission of a new FAQ question
+
+        This handles the submission of a question via a GET or POST request, updates the list of questions with the user's new question, and redirects the user to the FAQ page.
+
+        Returns:
+            The result of calling the faq_page() function, which renders the FAQ page with updated information.
         '''
         if request.method == 'POST':
             question = request.form['question']
@@ -398,7 +408,12 @@ def make_endpoints(app):
 
     @app.route("/submit_reply", methods=['GET', 'POST'])
     def submit_reply():
-        '''
+        '''Handles the submission of a reply to a FAQ question
+
+        This handles the submission of a reply to a FAQ question via a GET or POST request, updates the FAQ question with the user's reply, and redirects the user to the FAQ page.
+
+        Returns:
+            The result of calling the faq_page() function, which renders the FAQ page with updated information.        
         '''
         if request.method == 'POST':
             reply = request.form['reply']

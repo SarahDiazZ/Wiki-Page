@@ -13,12 +13,22 @@
         object-fit: cover;
         }
     </style>
-
+<body class='my-div'>
+    <style>
+        .my-div {
+                background-color: rgb(204, 217, 255);
+                height: auto;
+                width: auto;
+                overflow: auto;
+                } 
+    </style>
     <div id='navigation-buttons'>
         <head>
             <head>
                 <title>Wiki Server</title>
-                <style>
+                <style> 
+
+                                      
                 *   {box-sizing: border-box;}
                     
                     body {
@@ -28,7 +38,7 @@
 
                     .topnav {
                         overflow: hidden;
-                        background-color: #e9e9e9;
+                        background-color: #9775f7;
                         height: 8%;
                     }
 
@@ -43,7 +53,7 @@
                     }
 
                     .topnav a:hover {
-                        background-color: #9a5aed;
+                        background-color: #7dc7f8;
                         color: black;
                     }
 
@@ -168,7 +178,7 @@
                             const options = $('#list-pcparts option');
                             const results = $.map(options, function(option) {
                                 const value = option.value;
-                                if (value.toLowerCase().startsWith(request.term.toLowerCase())) {
+                                if (value.toLowerCase().includes(request.term.toLowerCase())) {
                                     return {
                                         label: value,
                                         value: value,
@@ -198,26 +208,26 @@
         </div>
         
         {% block content %}
-            <body id="Home">
+            <div id="Home" style="margin-left: 20px; margin-right: 20px">
                 {% if not current_user.is_authenticated %}
                     <p>
-                        <span>Welcome to our awesome Wiki Server, we're glad to have you here!</span>
+                        <br><span>Welcome to our awesome Wiki Server, we're glad to have you here!</span>
                     </p>
                 {% else %}
                     <p>
-                        Welcome, <span style = "color:fuchsia"><b>{{ current_user.username }}</b></span>!
+                        <br>Welcome, <span style = "color:rgb(137, 43, 245)"><b>{{ current_user.username }}</b></span>!
                     </p>
                 {% endif %}
 
-                <div id="your_id">       
+                <div id="your_id" style="margin-left: 20px; margin-right: 20px">       
                     <br><font size= 5><b>The Ultimate Guide to Building a PC</b></font>
                 </div>
-            </body>
-            <body id="imageGallery">
+            </div>
+            <body id="imageGallery" style="margin-left: 0px; margin-right: 0px">
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
                 <style>
                 .css-item {
-                    background-color: #777;
+                    background-color: rgb(179, 171, 245);
                     height: 700px;
                 }
             
@@ -230,28 +240,42 @@
                 <div id="computerCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <div class="carousel-item active css-item" data-bs-interval="5000">
-                    <img src="https://storage.cloud.google.com/awesomewikicontent/peripherals.jpeg" class="d-block w-100 css-img" alt="slide1">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/FullWhiteSetup.webp" class="d-block w-100 css-img" alt="slide1">
                     <div class="carousel-caption d-none d-md-block">
-                        <h5>First slide label</h5>
-                        <p>Some representative placeholder content for the first slide.</p>
+                        <h5>Full White Setup</h5>
+                        <h6>Sleek and minimalistic PC setup.</h6>
                     </div>
                 
                     </div>
                     <div class="carousel-item css-item" data-bs-interval="5000">
-                    <img src="https://storage.cloud.google.com/awesomewikicontent/ceo_of_cs.jpg" class="d-block w-100 css-img" alt="slide2">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/NintendoSetup.webp" class="d-block w-100 css-img" alt="slide2">
                     <div class="carousel-caption d-none d-md-block">
-                        <h5>Second slide label</h5>
-                        <p>Some representative placeholder content for the first slide.</p>
+                        <h5>Nintendo Setup</h5>
+                        <h6>A retro setup for Nintendo fans.</h6>
                     </div>
                 
                     </div>
                     <div class="carousel-item css-item" data-bs-interval="5000">
-                    <img src="https://storage.cloud.google.com/awesomewikicontent/kitty.jpg" class="d-block w-100 css-img" alt="slide3">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/PinkPC.png" class="d-block w-100 css-img" alt="slide3">
                     <div class="carousel-caption d-none d-md-block">
-                        <h5>Third slide label</h5>
-                        <p>Some representative placeholder content for the first slide.</p>
+                        <h5>Pink PC</h5>
+                        <h6>A glorious pink PC with liquid cooling.</h6>
                     </div>
-                
+
+                    </div>
+                    <div class="carousel-item css-item" data-bs-interval="5000">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/PinkSetup.png" class="d-block w-100 css-img" alt="slide3">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Pink Setup</h5>
+                        <h6>For pink lovers.</h6>
+                    </div>
+
+                    </div>
+                    <div class="carousel-item css-item" data-bs-interval="5000">
+                    <img src="https://storage.cloud.google.com/awesomewikicontent/SwitchSetup.jpg" class="d-block w-100 css-img" alt="slide3">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Nintendo Switch Setup</h5>
+                        <h6>If you're a Nintendo Switch lover, you wouldn't switch this setup for the world.</h6>
                     </div>
                 </div>
                 
@@ -266,8 +290,10 @@
                 
                 </div>
             </body>
-            <div id="contributors">
-                <p>Contributors:</p>
+            <div id="contributors" style="margin-left: 20px; margin-right: 20px">
+                <br><font size= 4><b>Contributors:</b></font>
+                <br>
+                Thank you to our contributors!
                 {% for contributor in contributors %}
                     <li>{{ contributor }}</li>
                 {% endfor %}
@@ -275,5 +301,5 @@
 
         {% endblock %}
     </div>
-    
+</body>   
 </html>
