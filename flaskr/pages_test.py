@@ -85,7 +85,10 @@ def test_home_page(client):
 
 
 def test_image_gallery(client):
-    """
+    """Tests if the image gallery is being displayed on the home page.
+
+    Args:
+        client: Test client for the Flask app.
     """
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
@@ -100,7 +103,11 @@ def test_image_gallery(client):
 
 
 def test_contributors(client):
-    """"""
+    """Tests to see if it has the contributors on the home page.
+
+    Args:
+        client: Test client for the Flask app.
+    """
     with patch.object(backend.Backend,
                       'get_all_page_names') as mock_get_all_page_names:
         mock_page_names = ['Page1', 'Page2', 'Page3']

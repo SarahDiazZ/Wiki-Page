@@ -232,7 +232,7 @@ def test_get_image():
 
 
 def test_successful_change_username():
-    """"""
+    """Tests if changing the username for the user is successful when the new username is not taken."""
     be = Backend()
     expected = True
     json_test_data = {
@@ -269,7 +269,7 @@ def test_successful_change_username():
 
 
 def test_unsuccessful_change_username():
-    """"""
+    """Tests if changing a username for the user fails when the username is taken."""
     be = Backend()
     expected = False
     json_test_data = {
@@ -292,7 +292,7 @@ def test_unsuccessful_change_username():
 
 
 def test_get_user_files():
-    """"""
+    """Tests retrieving all the files that were uploaded by the user."""
     be = Backend()
 
     json_test_data = {
@@ -314,6 +314,7 @@ def test_get_user_files():
 
 
 def test_delete_uploaded_file():
+    """Tests deleting an uploaded file from the user."""
     be = Backend()
 
     json_test_data = {
@@ -342,7 +343,7 @@ def test_delete_uploaded_file():
 
 
 def test_get_contributors():
-    """"""
+    """Tests the get_contributors method in the backend and see if it is retrieving the correct data."""
     be = Backend()
     blob1 = MagicMock()
     json_test_data = {

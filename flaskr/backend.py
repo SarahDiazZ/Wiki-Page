@@ -212,16 +212,18 @@ class Backend:
         return False
 
     def change_username(self, current_username, new_username):
-        """Summary.
+        """Changes the current user's username to the new one.
+
+        This modifies the current blob in the password bucket for the user and replaces it with the new username and deletes the old one.
+        Also modifies the JSON file for the user so all of their data is transferred to the new username.
 
         Args:
-            username:
-            current_username:
-            new_username:
+            current_username: current username of the user.
+            new_username: the username the user wants to change to.
 
         Returns:
-            True if.
-            False if.
+            False if the new username the user wants is already taken.
+            True if the user is not taken and the username is changed.
         """
         new_blob = self.password_bucket.blob(new_username)
         if new_blob.exists():
@@ -242,13 +244,13 @@ class Backend:
         return True
 
     def get_user_files(self, username):
-        """Summary.
+        """Retrieves the names of all the files the user has uploaded from info.json that stores all the user data.
 
         Args:
-            username:
+            username: the username of the user that is going to retrieve the uploaded files for.
 
         Returns:
-            Something
+            A list of the uploaded files from the specified user.
         """
         json_blob = self.content_bucket.get_blob("info.json")
         json_str = json_blob.download_as_bytes().decode()
@@ -256,14 +258,14 @@ class Backend:
         return json_dict[username]["files_uploaded"]
 
     def delete_uploaded_file(self, username, file_name):
-        """Summary.
+        """Deletes the uploaded file from the user and deletes it in GCS and the user info.json file.
 
         Args:
-            username:
-            file_name:
+            username: the user that needs to remove a file.
+            file_name: the uploaded file from the user.
 
         Returns:
-            Nothing.
+            True once the uploaded file from the user has been deleted.
         """
         blob = self.content_bucket.get_blob(file_name)
         blob.delete()
@@ -277,7 +279,14 @@ class Backend:
         return json_dict[username]["files_uploaded"]
 
     def get_contributors(self):
-        """
+        """Retrieves all the contributors of the wiki from the info.json that is stored in GCS.
+
+        Args:
+            username: the user that needs to remove a file.
+            file_name: the uploaded file from the user.
+
+        Returns:
+            True once the uploaded file from the user has been deleted.
         """
         json_blob = self.content_bucket.get_blob("info.json")
         json_str = json_blob.download_as_bytes().decode()
